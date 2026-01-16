@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // --- 1. จัดการรูปภาพ (Image) ---
     // เก็บไว้ที่ ../uploads/ (ถอยออกไปที่ Root)
     $targetDir = "uploads/"; 
-    if (!is_dir($targetDir)) mkdir($targetDir);
+    if (!is_dir($targetDir)) mkdir($targetDir, 0755, true);
     
     // ตั้งชื่อไฟล์รูปตาม Asset ID (Img_รหัส.jpg)
     $imageFileType = strtolower(pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION));
@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // --- 2. จัดการ QR Code ---
     // เก็บไว้ที่ ../qrcodes/ (ถอยออกไปที่ Root)
-    $qrDir = "../qrcodes/";
+    $qrDir = "qrcodes/";
     if (!is_dir($qrDir)) mkdir($qrDir);
     
     // ตั้งชื่อไฟล์ QR ตาม Asset ID (QR_รหัส.png)

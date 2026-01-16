@@ -264,7 +264,7 @@ $result = $conn->query($sql);
                         <th style="width: 15%;">รหัสงาน</th>
                         <th style="width: 20%;">ผู้แจ้ง</th>
                         <th style="width: 30%;">ปัญหา</th>
-                        <th style="width: 15%;">สถานะปัจจุบัน</th>
+                        <th style="width: 15%;">วันที่แจ้ง</th>
                         <th style="width: 20%;" class="text-center">อัปเดตสถานะ</th>
                     </tr>
                 </thead>
@@ -276,7 +276,6 @@ $result = $conn->query($sql);
                                 <?php echo $row['tracking_id']; ?>
                             </a>
                         </td>
-                        
                         <td>
                             <div class="fw-bold text-dark"><?php echo $row['reported_by']; ?></div>
                             <div class="text-muted small">
@@ -287,7 +286,10 @@ $result = $conn->query($sql);
                         <td>
                             <span class="text-secondary"><?php echo $row['problem_description']; ?></span>
                         </td>
-                        
+                        <td>
+                            <div class="date-cell"><?php echo date('d/m/Y', strtotime($row['created_at'])); ?></div>
+                            <div class="time-cell"><?php echo date('H:i', strtotime($row['created_at'])); ?> น.</div>
+                        </td>
                         <td>
                             <?php 
                                 $s = $row['status'];
@@ -338,19 +340,9 @@ $result = $conn->query($sql);
     <script>
         $(document).ready(function() {
             $('#manageTable').DataTable({
-                "language": {
-                    "search": "ค้นหา:",
-                    "lengthMenu": "แสดง _MENU_ รายการ",
-                    "info": "แสดง _START_ ถึง _END_ จาก _TOTAL_ รายการ",
-                    "paginate": {
-                        "next": '<i class="bi bi-chevron-right"></i>',
-                        "previous": '<i class="bi bi-chevron-left"></i>'
-                    },
-                    "emptyTable": "ไม่มีข้อมูลการแจ้งซ่อม"
-                },
-                "order": [[ 0, "desc" ]], // เรียงตามรหัสล่าสุด
-                "pageLength": 10,
-                "dom": '<"d-flex justify-content-between align-items-center mb-3"f>t<"d-flex justify-content-between align-items-center mt-3"ip>', // จัด layout ของ datatable ใหม่
+                "language": { "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/th.json" },
+                "order": [[ 1, "desc" ]], // เรียงตามวันที่ล่าสุด (คอลัมน์ที่ 2 index 1)
+                "pageLength": 10
             });
         });
 
