@@ -1,26 +1,19 @@
 <?php
 session_start();
-if (!isset($_SESSION['admin_logged_in'])) {
-    header("Location: index.php");
-    exit();
-}
+// if (!isset($_SESSION['admin_logged_in'])) { header("Location: index.php"); exit(); }
 
 include '../db_connect.php';
 
-// --- Logic อัปเดตสถานะ ---
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status']) && isset($_POST['request_id'])) {
+// --- Logic 1: อัปเดตสถานะ ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
     $new_status = $_POST['update_status'];
     $req_id = $_POST['request_id'];
     
-    // เตรียม SQL พื้นฐาน
     $sql = "UPDATE requests SET status = ?, updated_at = NOW()";
     
-    // ถ้าสถานะเป็น "กำลังซ่อม" ให้บันทึกเวลาเริ่มซ่อมด้วย
     if ($new_status == 'กำลังซ่อม') {
         $sql .= ", repair_started_at = NOW()";
-    }
-    // ถ้าสถานะเป็น "เสร็จสิ้น" ให้บันทึกเวลาเสร็จด้วย
-    elseif ($new_status == 'เสร็จสิ้น') {
+    } elseif ($new_status == 'เสร็จสิ้น') {
         $sql .= ", completed_at = NOW()";
     }
     
@@ -30,14 +23,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status']) && i
     $stmt->bind_param("si", $new_status, $req_id);
     
     if ($stmt->execute()) {
-        // สำเร็จ (อาจจะ Redirect หรือ Show alert ก็ได้)
+        // Redirect เพื่อป้องกันการกด F5 แล้วส่งข้อมูลซ้ำ
+        header("Location: manage_repairs.php");
+        exit();
     } else {
         echo "<script>alert('Error: " . $conn->error . "');</script>";
     }
     $stmt->close();
 }
 
-// ดึงข้อมูลทั้งหมด
+// --- Logic 2: ดึงข้อมูลใส่ตาราง ---
 $sql = "SELECT * FROM requests ORDER BY created_at DESC";
 $result = $conn->query($sql);
 ?>
@@ -47,283 +42,145 @@ $result = $conn->query($sql);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <title>จัดการงานซ่อม</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
     
     <style>
-        :root {
-            --sidebar-width: 280px;
-            --primary-color: #4e54c8;
-            --bg-color: #f3f4f6;
-            --text-color: #334155;
-        }
-
         body { 
             font-family: 'Kanit', sans-serif; 
-            background-color: var(--bg-color); 
-            color: var(--text-color);
-            display: flex;
-            min-height: 100vh;
-            overflow-x: hidden;
+            background-color: #f3f4f6; 
         }
 
-        /* === Modern Sidebar Styles === */
-        .sidebar {
-            width: var(--sidebar-width);
-            background: #ffffff;
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            display: flex;
-            flex-direction: column;
-            padding: 1.5rem;
-            box-shadow: 4px 0 24px rgba(0,0,0,0.02);
-            z-index: 1000;
-        }
-
-        .brand-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 2.5rem;
-            padding: 0 0.5rem;
-        }
-        
-        .brand-logo i {
-            font-size: 1.5rem;
-            background: rgba(78, 84, 200, 0.1);
-            padding: 8px;
-            border-radius: 12px;
-        }
-
-        .nav-menu {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            flex-grow: 1;
-        }
-
-        .nav-item {
-            margin-bottom: 0.5rem;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 12px 16px;
-            color: #64748b;
-            text-decoration: none;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-
-        .nav-link:hover {
-            background-color: #f8fafc;
-            color: var(--primary-color);
-            transform: translateX(4px);
-        }
-
-        .nav-link.active {
-            background: linear-gradient(135deg, #4e54c8 0%, #8f94fb 100%);
-            color: #ffffff;
-            box-shadow: 0 4px 12px rgba(78, 84, 200, 0.25);
-        }
-        
-        .nav-link i {
-            font-size: 1.2rem;
-        }
-
-        /* User Profile Section in Sidebar */
-        .user-profile-card {
-            background: #f8fafc;
-            padding: 12px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-top: auto; /* ดันไปล่างสุด */
-            border: 1px solid #e2e8f0;
-        }
-        
-        .user-avatar {
-            width: 40px; height: 40px;
-            background: #e0e7ff;
-            color: var(--primary-color);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-        }
-
-        .user-info h6 { margin: 0; font-size: 0.9rem; font-weight: 600; }
-        .user-info span { font-size: 0.75rem; color: #94a3b8; }
-        
-        .logout-btn {
-            color: #ef4444;
-            background: none;
-            border: none;
-            margin-left: auto;
-            cursor: pointer;
-            padding: 5px;
-            border-radius: 8px;
-            transition: 0.2s;
-        }
-        .logout-btn:hover { background: #fee2e2; }
-
-        /* === Main Content === */
+        /* เว้นที่ด้านซ้าย 280px ให้ Sidebar (สำคัญมาก!) */
         .main-content {
-            flex: 1;
-            margin-left: var(--sidebar-width);
+            margin-left: 280px; 
             padding: 2rem;
+            min-height: 100vh;
+            transition: margin-left 0.3s;
         }
 
-        /* Dashboard Cards */
-        .stat-card {
-            background: #ffffff;
-            border-radius: 20px;
-            padding: 1.5rem;
-            border: none;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-            transition: transform 0.3s;
-            height: 100%;
-            position: relative;
-            overflow: hidden;
-        }
-        .stat-card:hover { transform: translateY(-5px); }
-        
-        .stat-icon {
-            width: 50px; height: 50px;
-            border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
+        /* บนมือถือ ให้เต็มจอ */
+        @media (max-width: 992px) {
+            .main-content { margin-left: 0; }
         }
 
-        .stat-pending .stat-icon { background: #fffbeb; color: #fff176; }
-        .stat-repairing .stat-icon { background: #eff6ff; color: #ff7043; }
-        .stat-completed .stat-icon { background: #f0fdf4; color: #8bc34a; }
-        .status-pill {
-            padding: 6px 16px;
-            border-radius: 50px; /* ตรงนี้ทำให้มน */
-            font-size: 0.85rem;
-            font-weight: 500;
-            display: inline-block;
-            min-width: 100px;
-            text-align: center;
-        }
-        /* Table Card */
+        /* Style ของการ์ดตาราง */
         .table-card {
             background: #ffffff;
             border-radius: 20px;
             padding: 2rem;
             box-shadow: 0 4px 20px rgba(0,0,0,0.03);
         }
+
+        /* เม็ดยาสถานะ */
+        .status-pill {
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-block;
+            min-width: 100px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 
-    <!-- Sidebar (Nav) -->
-    <?php include 'sidebar.php'; ?>
+    <?php include 'Sidebar.php'; ?>
 
-    <!-- Main Content -->
     <div class="main-content">
-        
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h2 class="fw-bold mb-1">จัดการรายการแจ้งซ่อม</h2>
-                <p class="text-muted small">Update Status & Management</p>
+                <p class="text-muted small">Manage Repair Requests</p>
             </div>
+            
             <div class="d-flex align-items-center gap-3">
-                <div class="bg-white px-3 py-2 rounded-3 border shadow-sm text-muted small">
-                    <i class="bi bi-calendar-event me-2"></i> <?php echo date('d M Y'); ?>
+                <div class="bg-white px-3 py-2 rounded-3 border shadow-sm text-muted small d-flex align-items-center">
+                    <i class="bi bi-calendar-event me-2 text-primary"></i> 
+                    <span class="me-3"><?php echo date('d M Y'); ?></span>
+                    <div class="vr me-3"></div>
+                    <i class="bi bi-clock me-2 text-primary"></i>
+                    <span><?php echo date('H:i'); ?> น.</span>
                 </div>
             </div>
         </div>
 
         <div class="table-card">
-            <div class="card-header-custom">
-                <h5 class="card-title">รายการแจ้งซ่อมทั้งหมด</h5>
-                <button class="btn btn-outline-primary btn-sm rounded-pill px-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-title fw-bold m-0">รายการแจ้งซ่อมทั้งหมด</h5>
+                <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" onclick="location.reload();">
                     <i class="bi bi-arrow-clockwise"></i> Refresh
                 </button>
             </div>
 
-            <table id="manageTable" class="table table-hover align-middle">
-                <thead>
+            <table id="manageTable" class="table table-hover align-middle w-100">
+                <thead class="table-light">
                     <tr>
-                        <th style="width: 15%;">รหัสงาน</th>
-                        <th style="width: 20%;">ผู้แจ้ง</th>
-                        <th style="width: 30%;">ปัญหา</th>
-                        <th style="width: 15%;">วันที่แจ้ง</th>
-                        <th style="width: 20%;" class="text-center">อัปเดตสถานะ</th>
+                        <th width="15%">รหัสงาน</th>
+                        <th width="20%">ผู้แจ้ง</th>
+                        <th width="20%">ปัญหา</th>
+                        <th width="15%">วันที่แจ้ง</th> <th width="15%">สถานะ</th>
+                        <th width="10%" class="text-center">จัดการ</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php while($row = $result->fetch_assoc()): ?>
                     <tr>
-                        <td>
-                            <a href="#" class="job-id text-decoration-none">
-                                <?php echo $row['tracking_id']; ?>
-                            </a>
-                        </td>
+                        <td><span class="fw-bold text-primary"><?php echo $row['tracking_id']; ?></span></td>
+                        
                         <td>
                             <div class="fw-bold text-dark"><?php echo $row['reported_by']; ?></div>
                             <div class="text-muted small">
-                                <?php echo $row['building'] . " ห้อง " . $row['room']; ?>
+                                <i class="bi bi-geo-alt"></i> <?php echo $row['building'] . " / " . $row['room']; ?>
                             </div>
                         </td>
                         
                         <td>
-                            <span class="text-secondary"><?php echo $row['problem_description']; ?></span>
+                            <span class="text-secondary text-truncate d-inline-block" style="max-width: 180px;">
+                                <?php echo $row['problem_description']; ?>
+                            </span>
                         </td>
+
                         <td>
-                            <div class="date-cell"><?php echo date('d/m/Y', strtotime($row['created_at'])); ?></div>
-                            <div class="time-cell"><?php echo date('H:i', strtotime($row['created_at'])); ?> น.</div>
+                            <div class="fw-medium text-dark">
+                                <?php echo date('d/m/Y', strtotime($row['created_at'])); ?>
+                            </div>
+                            <div class="text-muted small">
+                                <i class="bi bi-clock me-1"></i>
+                                <?php echo date('H:i', strtotime($row['created_at'])); ?> น.
+                            </div>
                         </td>
+
                         <td>
                             <?php 
                                 $s = $row['status'];
-                                // กำหนดสีพื้นหลังและสีตัวอักษรตามสถานะ
-                                $bgColor = '#64748b'; // สีเทา (Default)
-                                $textColor = '#ffffff';
-
-                                if ($s == 'เสร็จสิ้น') {
-                                    $bgColor = '#10b981'; // เขียวมรกต
-                                } else if ($s == 'กำลังซ่อม') {
-                                    $bgColor = '#3b82f6'; // ฟ้าสดใส 
-                                } else if ($s == 'รอรับเรื่อง') {
-                                    $bgColor = '#f59e0b'; // เหลืองอำพัน
-                                    $textColor = '#000000'; // ตัวหนังสือสีดำ
-                                } else if ($s == 'ยกเลิก') {
-                                    $bgColor = '#ef4444'; // แดง
-                                }
+                                $c = 'bg-secondary';
+                                if ($s == 'เสร็จสิ้น') $c = 'bg-success';
+                                elseif ($s == 'กำลังซ่อม') $c = 'bg-primary';
+                                elseif ($s == 'รอรับเรื่อง') $c = 'bg-warning text-dark';
+                                elseif ($s == 'ยกเลิก') $c = 'bg-danger';
                             ?>
-                            <span class="status-pill" style="background-color: <?php echo $bgColor; ?>; color: <?php echo $textColor; ?>;">
-                            <?php echo $s; ?>
+                            <span class="status-pill shadow-sm text-white <?php echo $c; ?>">
+                                <?php echo $s; ?>
                             </span>
                         </td>
                         
-                        <td>
-                            <form method="POST" class="d-flex justify-content-center">
-                                <input type="hidden" name="request_id" value="<?php echo $row['id']; ?>">
-                                <select name="update_status" class="form-select form-select-sm-custom w-auto" onchange="confirmStatusUpdate(this)">
-                                    <option value="" disabled selected>เลือกสถานะ</option>
-                                    <option value="รอรับเรื่อง">รอรับเรื่อง</option>
-                                    <option value="กำลังซ่อม">กำลังซ่อม</option>
-                                    <option value="เสร็จสิ้น">เสร็จสิ้น</option>
-                                    <option value="ยกเลิก">ยกเลิก</option>
-                                </select>
-                            </form>
+                        <td class="text-center">
+                            <button class="btn btn-light btn-sm text-primary border shadow-sm btn-view-case" 
+                                    data-id="<?php echo $row['id']; ?>"
+                                    data-tracking="<?php echo $row['tracking_id']; ?>"
+                                    data-reporter="<?php echo $row['reported_by']; ?>"
+                                    data-location="<?php echo $row['building'] . ' ' . $row['room']; ?>"
+                                    data-problem="<?php echo $row['problem_description']; ?>"
+                                    data-date="<?php echo date('d/m/Y H:i', strtotime($row['created_at'])); ?>"
+                                    data-status="<?php echo $row['status']; ?>">
+                                <i class="bi bi-search"></i>
+                            </button>
                         </td>
                     </tr>
                     <?php endwhile; ?>
@@ -332,42 +189,106 @@ $result = $conn->query($sql);
         </div>
     </div>
 
+    <div class="modal fade" id="repairModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold text-primary">
+                        <i class="bi bi-tools me-2"></i>อัปเดตงาน: <span id="modalTrackingId">...</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="row g-0">
+                        <div class="col-md-7 p-4 bg-white">
+                            <h6 class="text-muted fw-bold small mb-3 border-bottom pb-2">รายละเอียด</h6>
+                            <div class="mb-3">
+                                <label class="small text-muted">ผู้แจ้ง</label>
+                                <div class="fw-bold fs-5" id="modalReporter">...</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <label class="small text-muted">สถานที่</label>
+                                    <div class="fw-medium" id="modalLocation">...</div>
+                                </div>
+                                <div class="col-6">
+                                    <label class="small text-muted">เวลาแจ้ง</label>
+                                    <div class="fw-medium" id="modalDate">...</div>
+                                </div>
+                            </div>
+                            <div class="p-3 bg-light rounded border">
+                                <label class="small text-muted mb-1">อาการ</label>
+                                <div id="modalProblem" class="text-dark">...</div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-5 p-4 bg-light border-start d-flex flex-column justify-content-center">
+                            <form method="POST">
+                                <input type="hidden" name="request_id" id="modalRequestId">
+                                <div class="text-center mb-3">
+                                    <span class="badge rounded-pill bg-secondary px-3 py-2" id="modalCurrentStatusBadge">...</span>
+                                </div>
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <label class="form-label fw-bold small">อัปเดตสถานะ</label>
+                                        <select name="update_status" class="form-select mb-3">
+                                            <option value="รอรับเรื่อง">รอรับเรื่อง</option>
+                                            <option value="กำลังซ่อม">กำลังซ่อม</option>
+                                            <option value="เสร็จสิ้น">เสร็จสิ้น</option>
+                                            <option value="ยกเลิก">ยกเลิก</option>
+                                        </select>
+                                        <button class="btn btn-primary w-100">บันทึก</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    
     <script>
         $(document).ready(function() {
+            // Setup DataTable
             $('#manageTable').DataTable({
                 "language": { "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/th.json" },
-                "order": [[ 1, "desc" ]], // เรียงตามวันที่ล่าสุด (คอลัมน์ที่ 2 index 1)
-                "pageLength": 10
+                "order": [[ 0, "desc" ]] // เรียงตามรหัสงานล่าสุด
+            });
+
+            // Handle Modal
+            $(document).on('click', '.btn-view-case', function() {
+                const b = $(this);
+                // ส่งค่าเข้า Modal
+                $('#modalRequestId').val(b.data('id'));
+                $('#modalTrackingId').text(b.data('tracking'));
+                $('#modalReporter').text(b.data('reporter'));
+                $('#modalLocation').text(b.data('location'));
+                $('#modalProblem').text(b.data('problem'));
+                $('#modalDate').text(b.data('date'));
+                
+                // จัดการสี Badge ใน Modal
+                const s = b.data('status');
+                $('#modalCurrentStatusBadge').text(s);
+                let cls = 'bg-secondary';
+                if(s === 'เสร็จสิ้น') cls = 'bg-success';
+                else if(s === 'กำลังซ่อม') cls = 'bg-primary';
+                else if(s === 'รอรับเรื่อง') cls = 'bg-warning text-dark';
+                else if(s === 'ยกเลิก') cls = 'bg-danger';
+                
+                $('#modalCurrentStatusBadge').removeClass().addClass('badge rounded-pill px-3 py-2 ' + cls);
+                
+                // Set default select option
+                $('select[name="update_status"]').val(s);
+                
+                new bootstrap.Modal(document.getElementById('repairModal')).show();
             });
         });
-
-        function confirmStatusUpdate(selectElement) {
-            const status = selectElement.value;
-            Swal.fire({
-                title: 'อัปเดตสถานะ?',
-                text: `ต้องการเปลี่ยนสถานะเป็น "${status}" ใช่หรือไม่`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#2563eb',
-                cancelButtonColor: '#94a3b8',
-                confirmButtonText: 'ยืนยัน',
-                cancelButtonText: 'ยกเลิก',
-                customClass: {
-                    popup: 'rounded-4' // ให้ Popup มนสวยๆ
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    selectElement.form.submit();
-                } else {
-                    selectElement.selectedIndex = 0; 
-                }
-            });
-        }
     </script>
 </body>
 </html>

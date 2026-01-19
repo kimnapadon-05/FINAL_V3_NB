@@ -31,116 +31,7 @@ require_once "../db_connect.php"; // ตรวจสอบ path ให้ถู�
             overflow-x: hidden;
         }
 
-        /* === Modern Sidebar Styles === */
-        .sidebar {
-            width: var(--sidebar-width);
-            background: #ffffff;
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            display: flex;
-            flex-direction: column;
-            padding: 1.5rem;
-            box-shadow: 4px 0 24px rgba(0,0,0,0.02);
-            z-index: 1000;
-        }
-
-        .brand-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 2.5rem;
-            padding: 0 0.5rem;
-        }
-        
-        .brand-logo i {
-            font-size: 1.5rem;
-            background: rgba(78, 84, 200, 0.1);
-            padding: 8px;
-            border-radius: 12px;
-        }
-
-        .nav-menu {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            flex-grow: 1;
-        }
-
-        .nav-item {
-            margin-bottom: 0.5rem;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 12px 16px;
-            color: #64748b;
-            text-decoration: none;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-
-        .nav-link:hover {
-            background-color: #f8fafc;
-            color: var(--primary-color);
-            transform: translateX(4px);
-        }
-
-        .nav-link.active {
-            background: linear-gradient(135deg, #4e54c8 0%, #8f94fb 100%);
-            color: #ffffff;
-            box-shadow: 0 4px 12px rgba(78, 84, 200, 0.25);
-        }
-        
-        .nav-link i {
-            font-size: 1.2rem;
-        }
-
-        /* User Profile Section in Sidebar */
-        .user-profile-card {
-            background: #f8fafc;
-            padding: 12px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-top: auto; /* ดันไปล่างสุด */
-            border: 1px solid #e2e8f0;
-        }
-        
-        .user-avatar {
-            width: 40px; height: 40px;
-            background: #e0e7ff;
-            color: var(--primary-color);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-        }
-
-        .user-info h6 { margin: 0; font-size: 0.9rem; font-weight: 600; }
-        .user-info span { font-size: 0.75rem; color: #94a3b8; }
-        
-        .logout-btn {
-            color: #ef4444;
-            background: none;
-            border: none;
-            margin-left: auto;
-            cursor: pointer;
-            padding: 5px;
-            border-radius: 8px;
-            transition: 0.2s;
-        }
-        .logout-btn:hover { background: #fee2e2; }
-
+    
         /* === Main Content === */
         .main-content {
             flex: 1;
@@ -257,9 +148,9 @@ require_once "../db_connect.php"; // ตรวจสอบ path ให้ถู�
                         <i class="bi bi-printer-fill me-2"></i> พิมพ์ที่เลือก
                     </button>
                     <!-- ปุ่มเพิ่ม -->
-                    <a href="QR_code.php" class="btn btn-primary rounded-pill px-4 shadow-sm" style="background: var(--primary-color); border:none;">
+                    <!--a href="QR_code.php" class="btn btn-primary rounded-pill px-4 shadow-sm" style="background: var(--primary-color); border:none;">
                         <i class="bi bi-plus-lg me-2"></i>เพิ่มอุปกรณ์
-                    </a>
+                    </a-->
                 </div>
             </div>
 

@@ -90,51 +90,52 @@ if ($status == 'กำลังซ่อม') {
             <div class="ps-2">
                 
                 <!-- 1. รอรับเรื่อง -->
-                <div class="mb-3">
-                    <div class="fw-bold text-success mb-1">
-                        <i class="bi bi-1-circle-fill me-2"></i> รอรับเรื่อง
+                <div class="timeline-item d-flex mb-3">
+                    <div class="me-3"> <!-- ไอคอนซ้าย -->
+                        <i class="bi bi-1-circle-fill text-success fs-5"></i>
                     </div>
-                    <!-- เอา ms-4 ออก และใช้ ps-4 แทน เพื่อให้จัดหน้าดีขึ้นในมือถือ -->
-                    <div class="ps-4 text-secondary" style="font-size: 0.85rem;">
-                        <div>รับเรื่องเข้าระบบเมื่อ:</div>
-                        <div class="text-dark"><?php echo $created_time; ?></div>
+                    <div> <!-- เนื้อหาขวา -->
+                        <div class="fw-bold text-success">รอรับเรื่อง</div>
+                        <div class="small text-secondary mt-1">รับเรื่องเมื่อ: <?php echo $created_time; ?></div>
                     </div>
                 </div>
 
-                <!-- 2. กำลังซ่อม -->
-                <div class="mb-3">
+                <div class="timeline-item d-flex mb-3">
                     <?php 
                         $step2 = ($status == 'กำลังซ่อม' || $status == 'เสร็จสิ้น');
-                        $step2_cls = $step2 ? 'text-warning' : 'text-secondary'; // เปลี่ยน text-muted เป็น text-secondary
+                        $step2_cls = $step2 ? 'text-warning' : 'text-muted'; // เปลี่ยน text-secondary เป็น text-muted ถ้ายังไม่ถึง
                         $step2_icon = $step2 ? 'bi-2-circle-fill' : 'bi-2-circle';
                         
                         $time_show_repair = ($status == 'กำลังซ่อม' && $start_time) ? "เริ่มเมื่อ: $start_time" : "รอเจ้าหน้าที่ดำเนินการ";
                         if ($status == 'เสร็จสิ้น') $time_show_repair = "ดำเนินการเรียบร้อยแล้ว"; 
                     ?>
-                    <div class="fw-bold <?php echo $step2_cls; ?> mb-1">
-                        <i class="bi <?php echo $step2_icon; ?> me-2"></i> กำลังซ่อม
+                    <div class="me-3">
+                        <i class="bi <?php echo $step2_icon; ?> <?php echo $step2_cls; ?> fs-5"></i>
                     </div>
-                    <div class="ps-4 text-secondary" style="font-size: 0.85rem;">
-                        <?php echo $time_show_repair; ?>
+                    <div>
+                        <div class="fw-bold <?php echo $step2_cls; ?>">กำลังซ่อม</div>
+                        <div class="small text-secondary mt-1"><?php echo $time_show_repair; ?></div>
                     </div>
                 </div>
 
                 <!-- 3. เสร็จสิ้น -->
-                <div>
+                <div class="timeline-item d-flex">
                     <?php 
                         $step3 = ($status == 'เสร็จสิ้น');
-                        $step3_cls = $step3 ? 'text-success' : 'text-secondary';
+                        $step3_cls = $step3 ? 'text-success' : 'text-muted';
                         $step3_icon = $step3 ? 'bi-3-circle-fill' : 'bi-3-circle';
                         
                         $time_done = ($status == 'เสร็จสิ้น' && $end_time) ? "เสร็จสิ้นเมื่อ: $end_time" : "ยังไม่เสร็จสิ้น";
                     ?>
-                    <div class="fw-bold <?php echo $step3_cls; ?> mb-1">
-                        <i class="bi <?php echo $step3_icon; ?> me-2"></i> เสร็จสิ้น
+                    <div class="me-3">
+                        <i class="bi <?php echo $step3_icon; ?> <?php echo $step3_cls; ?> fs-5"></i>
                     </div>
-                    <div class="ps-4 text-secondary" style="font-size: 0.85rem;">
-                        <?php echo $time_done; ?>
+                    <div>
+                        <div class="fw-bold <?php echo $step3_cls; ?>">เสร็จสิ้น</div>
+                        <div class="small text-secondary mt-1"><?php echo $time_done; ?></div>
                     </div>
                 </div>
+                
             </div>
         </div>
 

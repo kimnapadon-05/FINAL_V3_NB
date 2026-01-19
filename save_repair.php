@@ -19,9 +19,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     // รับค่าตัวแปรจากฟอร์ม
     $reporter_name  = $_POST['reporter_name'] ?? '';
-    $reporter_id    = $_POST['reporter_id'] ?? '';
+    $reporter_id = mysqli_real_escape_string($conn, $_POST['reporter_id']);
     $reporter_phone = $_POST['reporter_phone'] ?? '';
     $reporter_email = $_POST['email'] ?? ''; 
+    $device_serial = mysqli_real_escape_string($conn, $_POST['device_serial']);
+    $device_name   = mysqli_real_escape_string($conn, $_POST['device_name']);
     $device_type    = $_POST['device_type'] ?? '';
     $building       = $_POST['building'] ?? '';
     $room           = isset($_POST['room']) ? $_POST['room'] : '-'; 
@@ -53,8 +55,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // บันทึกข้อมูล (ต้องตรงกับโครงสร้างตาราง requests)
     $sql = "INSERT INTO requests (
-        tracking_id, status, reported_by, asset_id, tel, reporter_email, 
-        device_type, building, room, problem_description, img_path, created_at
+        tracking_id, status, reported_by, reporter_id, asset_id, tel, reporter_email, 
+        device_type, serial_no, device_name, building, room, problem_description, img_path, created_at
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
 
     $stmt = $conn->prepare($sql);
@@ -67,12 +69,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $reporter_name,  
             $reporter_id,    
             $reporter_phone, 
-            $reporter_email, 
+            $reporter_email,
+            $scanned_asset_id, 
             $device_type,    
+            $device_serial,  
+            $device_name,    
             $building,       
             $room,           
             $problem_detail, 
-            $image_path      
+            $image_path,
+            'pending'      
         );
 
         if ($stmt->execute()) {
