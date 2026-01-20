@@ -192,12 +192,12 @@ $url_asset_id = isset($_GET['asset_id']) ? htmlspecialchars($_GET['asset_id']) :
 
                                     <div class="col-md-6">
                                         <label class="form-label">เลขครุภัณฑ์ (Asset Number) </label>
-                                        <input type="text" class="form-control bg-light" name="device_name" id="deviceNameInput" readonly>
+                                        <input type="text" class="form-control bg-light" id="assetNumberInput" readonly>
                                     </div>
 
                                     <div class="col-md-6">
                                         <label class="form-label">ชื่อรุ่น / Model</label>
-                                        <input type="text" class="form-control bg-light" name="device_model" id="deviceModelInput" placeholder="เช่น Lenovo ThinkPad" readonly>
+                                        <input type="text" class="form-control bg-light" name="device_model" id="deviceModelInput" readonly>
                                     </div>
                                     
                                     <div class="col-md-6">
@@ -457,8 +457,9 @@ $url_asset_id = isset($_GET['asset_id']) ? htmlspecialchars($_GET['asset_id']) :
             input.value = '';
         };
 
-        // ฟังก์ชันเมื่อสแกนสำเร็จ
+        // ฟังก์ชันเมื่อสแกนสำเร็จ (ฉบับแก้ไขสมบูรณ์)
         const onScanSuccess = (decodedText) => {
+            // 1. หยุดกล้องเมื่อสแกนเจอ
             if (html5QrCode && html5QrCode.isScanning) {
                 html5QrCode.stop().then(() => {
                     readerDiv.style.display = 'none';
@@ -467,21 +468,112 @@ $url_asset_id = isset($_GET['asset_id']) ? htmlspecialchars($_GET['asset_id']) :
             scanControls.style.display = 'none';
 
             let id = decodedText.trim();
-            console.log("Original Text:", id);
+            console.log("Scanned Text:", id);
 
-            // 1. ถ้าเจอรูปแบบ Text: IT|2200...
+            // 2. เช็คว่าเป็น Format ใหม่ของเราไหม (ขึ้นต้นด้วย IT|)
+            // Format: IT | AssetID | Type | Model | Serial | Name | Location
             if (id.toUpperCase().startsWith("IT|")) {
                 const parts = id.split("|");
-                // รูปแบบ: IT | AssetID | Type | Serial | Name | Location
-                if (parts.length >= 2) {
-                    id = parts[1]; // เอาตัวที่ 2 คือ Asset ID
+                
+                if (scanMode === 'form') {
+                    // --- ส่วนกรอกฟอร์มอัตโนมัติ ---
+                    // 1. เติม Asset ID (Hidden และ Visible)
+                    if(parts[1]) {
+                    // ใส่ค่าลง Hidden Input (สำหรับส่งไป DB)
+                    document.getElementById('scannedAssetId').value = parts[1];
+                    const displayInput = document.getElementById('assetNumberInput'); 
+                    if(displayInput) displayInput.value = parts[1];
+                    }
+
+                    // [2] Type (parts[2]) -> Auto Select
+                    if(parts[2]) {
+                        const typeMap = {
+                            'COMPUTER EQUIPMENT': 'Computer',
+                            'NOTEBOOK': 'Computer',
+                            'PROJECTOR': 'Projector',
+                            'ACCESS POINT': 'AccessPoint',
+                            'PRINTER': 'Other'
+                        };
+                        const mappedType = typeMap[parts[2].toUpperCase()] || 'Other';
+                        const deviceSelect = document.getElementById('deviceTypeSelect');
+                        if(deviceSelect) deviceSelect.value = mappedType;
+                    }
+
+                    // [3] Model (parts[3]) -> ช่องชื่อรุ่น
+                    if(parts[3]) {
+                        const modelInput = document.getElementById('deviceModelInput');
+                        if(modelInput) modelInput.value = parts[3];
+                    }
+
+                    // [4] Serial (parts[4]) -> ช่อง Serial
+                    if(parts[4]) {
+                        const serialInput = document.getElementById('deviceSerialInput');
+                        if(serialInput) serialInput.value = parts[4];
+                    }
+
+                    // [5] Name (parts[5]) -> ช่องชื่ออุปกรณ์
+                    if(parts[5]) {
+                        const nameInput = document.getElementById('deviceNameInput');
+                        if(nameInput) nameInput.value = parts[5];
+                    }
+
+                    // [6] Location (parts[6]) -> เลือกตึก/ห้อง
+                    // 6. Location (parts[6]) -> เลือกตึก/ห้อง
+                    // 6. Location (parts[6]) -> เลือกตึก/ห้อง
+                    if(parts[6]) {
+                        const loc = parts[6]; // ค่าที่ได้: "ตึก 26 TC203"
+                        
+                        // 1. เลือกตึก (Logic เดิม)
+                        if (loc.includes("14")) buildingSelect.value = "ตึก 14";
+                        else if (loc.includes("26")) buildingSelect.value = "ตึก 26";
+                        else buildingSelect.value = "Other"; 
+
+                        loadRooms(); // โหลดรายชื่อห้องมารรอ
+
+                        // 2. เลือกห้อง (Logic ใหม่: ตัดคำเอาเฉพาะตัวหลังสุด)
+                        setTimeout(() => {
+                            // ตัดช่องว่าง แล้วเอาตัวสุดท้าย (จะได้ "TC203")
+                            const roomCode = loc.trim().split(" ").pop(); 
+                            
+                            const options = roomSelect.options;
+                            let found = false;
+
+                            for(let i=0; i<options.length; i++) {
+                                // เช็คว่า ตัวเลือกใน Dropdown ตรงกับ roomCode ที่เราตัดมาไหม
+                                if(options[i].value === roomCode) {
+                                    roomSelect.value = options[i].value;
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            
+                            // ถ้าหาไม่เจอจริงๆ ค่อยยัดค่าเต็มลงไป (กันเหนียว)
+                            if (!found) {
+                                var opt = document.createElement('option');
+                                opt.value = roomCode; // ใส่แค่รหัสห้องพอ
+                                opt.innerHTML = roomCode;
+                                opt.selected = true;
+                                roomSelect.appendChild(opt);
+                            }
+
+                        }, 500);
+                    }
+
+                    closeModal(); // ปิดหน้าต่างสแกน
+                    
+                } else if (scanMode === 'track') {
+                    // ถ้าเป็นโหมดติดตามงานซ่อม ให้ใช้ Asset ID (parts[1])
+                    fetchStatus(parts[1]); 
                 }
+                
+                return; // จบการทำงาน (สำคัญมาก ห้ามลบ)
             } 
-            // 2. ถ้าเจอ URL: index.php?asset_id=...
+            
+            // 3. ถ้าเจอ URL: index.php?asset_id=... (เผื่อใช้ QR แบบเก่า)
             else if (id.includes('asset_id=')) {
                 try { id = id.split('asset_id=')[1].split('&')[0]; } catch(e){}
             } 
-            // 3. ถ้าเจอ URL: track.php?tracking_id=...
+            // 4. ถ้าเจอ URL: track.php?tracking_id=...
             else if (id.includes('tracking_id=')) {
                 try { id = id.split('tracking_id=')[1].split('&')[0]; } catch(e){}
             }
@@ -489,6 +581,7 @@ $url_asset_id = isset($_GET['asset_id']) ? htmlspecialchars($_GET['asset_id']) :
             console.log("Parsed ID:", id, "Mode:", scanMode);
 
             if (scanMode === 'form') {
+                // ถ้าสแกนได้แค่ ID เดี่ยวๆ ให้ไปดึงข้อมูลจาก DB
                 fetchEquipmentData(id);
                 closeModal();
             } else if (scanMode === 'track') {

@@ -178,6 +178,7 @@ $result = $conn->query($sql);
                                     data-location="<?php echo $row['building'] . ' ' . $row['room']; ?>"
                                     data-problem="<?php echo $row['problem_description']; ?>"
                                     data-date="<?php echo date('d/m/Y H:i', strtotime($row['created_at'])); ?>"
+                                    data-image="<?php echo $row['img_path']; ?>"
                                     data-status="<?php echo $row['status']; ?>">
                                 <i class="bi bi-search"></i>
                             </button>
@@ -221,7 +222,6 @@ $result = $conn->query($sql);
                                 <div id="modalProblem" class="text-dark">...</div>
                             </div>
                         </div>
-                        
                         <div class="col-md-5 p-4 bg-light border-start d-flex flex-column justify-content-center">
                             <form method="POST">
                                 <input type="hidden" name="request_id" id="modalRequestId">
@@ -232,7 +232,7 @@ $result = $conn->query($sql);
                                     <div class="card-body">
                                         <label class="form-label fw-bold small">อัปเดตสถานะ</label>
                                         <select name="update_status" class="form-select mb-3">
-                                            <option value="รอรับเรื่อง">รอรับเรื่อง</option>
+                                            <option value="รอดำเนินการ">รอดำเนินการ</option>
                                             <option value="กำลังซ่อม">กำลังซ่อม</option>
                                             <option value="เสร็จสิ้น">เสร็จสิ้น</option>
                                             <option value="ยกเลิก">ยกเลิก</option>
@@ -242,6 +242,32 @@ $result = $conn->query($sql);
                                 </div>
                             </form>
                         </div>
+                        <div id="modalImgArea" class="mt-3 d-none">
+                        <div class="col-md-7 p-4 bg-white">
+                        <h6 class="text-muted fw-bold small mb-3 border-bottom pb-2">
+                            <i class="bi bi-image me-1"></i> รูปภาพประกอบ
+                        </h6>
+                            
+                         <div class="bg-white p-2 rounded-4 border shadow-sm">
+                            <div class="rounded-3 bg-light d-flex align-items-center justify-content-center position-relative overflow-hidden" 
+                                style="width: 100%; height: 200px; border: 1px solid #f1f5f9;">
+                                
+                                <img id="modalImgShow" src="" 
+                                    style="max-width: 100%; max-height: 100%; object-fit: contain; cursor: pointer; transition: transform 0.3s;"
+                                    onmouseover="this.style.transform='scale(1.05)'" 
+                                    onmouseout="this.style.transform='scale(1)'"
+                                    onclick="document.getElementById('modalImgLink').click()"> 
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mt-2 px-1">
+                                <span class="text-muted small"><i class="bi bi-info-circle me-1"></i>คลิกที่รูปเพื่อขยาย</span>
+                                
+                                <a id="modalImgLink" href="" target="_blank" class="text-decoration-none small fw-bold text-primary py-1 px-2 rounded hover-bg-light">
+                                    <i class="bi bi-arrows-fullscreen me-1"></i> ดูรูปขนาดเต็ม
+                                </a>
+                                </div>
+                            </div>
+                        </div>                                     
                     </div>
                 </div>
             </div>
@@ -271,14 +297,34 @@ $result = $conn->query($sql);
                 $('#modalLocation').text(b.data('location'));
                 $('#modalProblem').text(b.data('problem'));
                 $('#modalDate').text(b.data('date'));
+                // logic เพิ่มเติมสำหรับรูปภาพ
+                const imgPath = b.data('image'); // รับค่า path รูป
+                const imgArea = $('#modalImgArea');
+                const imgShow = $('#modalImgShow');
+                const imgLink = $('#modalImgLink');
                 
+                if (imgPath && imgPath.trim() !== '') {
+                    
+                    let finalPath = imgPath;
+                    if (!finalPath.startsWith('../') && !finalPath.startsWith('http')) {
+                        // ถ้ายังไม่มี ../ ให้เติมเข้าไป (เผื่อไฟล์ manage_repairs อยู่ในโฟลเดอร์ admin)
+                        finalPath = '../' + finalPath; 
+                    }
+
+                    imgShow.attr('src', finalPath);
+                    imgLink.attr('href', finalPath);
+                    imgArea.removeClass('d-none'); 
+                } else {
+                    // ถ้าไม่มีรูป ให้ซ่อนกล่อง
+                    imgArea.addClass('d-none');
+                }
                 // จัดการสี Badge ใน Modal
                 const s = b.data('status');
                 $('#modalCurrentStatusBadge').text(s);
                 let cls = 'bg-secondary';
                 if(s === 'เสร็จสิ้น') cls = 'bg-success';
                 else if(s === 'กำลังซ่อม') cls = 'bg-primary';
-                else if(s === 'รอรับเรื่อง') cls = 'bg-warning text-dark';
+                else if(s === 'รอดำเนินการ') cls = 'bg-warning text-dark';
                 else if(s === 'ยกเลิก') cls = 'bg-danger';
                 
                 $('#modalCurrentStatusBadge').removeClass().addClass('badge rounded-pill px-3 py-2 ' + cls);

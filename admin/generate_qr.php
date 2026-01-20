@@ -9,7 +9,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $model_name = $_POST['model_name']; 
     $equipment_type = $_POST['equipment_type'];
     $serial_no = $_POST['serial_no'];
-    $location = $_POST['location'];
+    $building = $_POST['building'];
+    $room = $_POST['room'];
+    
 
     // --- 1. จัดการรูปภาพ (Image) ---
     // เก็บไว้ที่ ../uploads/ (ถอยออกไปที่ Root)
@@ -38,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $qrFileDB = "qrcodes/" . $newQrName;      // Path สำหรับลง DB (ไม่มี ../)
     
     // ข้อมูลใน QR
-    $qrData = "IT|$asset_id|$equipment_type|$serial_no|$equipment_name|$location";
+    $qrData = "IT|$asset_id|$equipment_type|$model_name|$serial_no|$equipment_name|$location";
     
     // สร้าง QR Code
     QRcode::png($qrData, $qrFileUpload, QR_ECLEVEL_L, 4);
@@ -61,8 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->execute();
     $stmt->close();
     $conn->close();
-
-    // --- ส่งไปหน้า Print (แก้ Syntax Error ตรงนี้ให้แล้วครับ) ---
+    // --- 4. แจ้งผลลัพธ์ ---
     echo "<script>
         alert('บันทึกและสร้าง QR Code เรียบร้อย!');
         window.location.href='manage_equipment.php?qrcode=" . urlencode($qrFileDB) . "&asset=" . urlencode($asset_id) . "';

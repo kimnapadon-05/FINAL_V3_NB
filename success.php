@@ -61,68 +61,61 @@ $tracking_id = isset($_GET['track_id']) ? htmlspecialchars($_GET['track_id']) : 
         const trackingId = "<?php echo $tracking_id; ?>";
         
         if (trackingId) {
-            // สร้าง URL ที่ถูกต้อง (Absolute URL)
-            // ตรวจสอบ path ให้แน่ใจว่า /track.php ถูกต้อง
-            const trackingUrl = window.location.origin + window.location.pathname.replace("success.php", "track.php") + "?tracking_id=" + trackingId;
+            // 1. สร้าง URL สำหรับเช็คสถานะ
+            const trackingUrl = window.location.origin + window.location.pathname.replace("success.php", "index.php") + "?tracking_id=" + trackingId;
 
-            // สร้าง QR Code
             const qrContainer = document.getElementById("qrcode");
-            
-            // เคลียร์ QR Code เก่า (ถ้ามี)
             qrContainer.innerHTML = "";
 
-            new QRCode(qrContainer, {
+            // 2. สั่งสร้าง QR Code
+            const qrcode = new QRCode(qrContainer, {
                 text: trackingUrl,
-                width: 250,  
-                height: 250,
+                width: 256,  
+                height: 256,
                 colorDark : "#000000", 
                 colorLight : "#ffffff",
-                correctLevel : QRCode.CorrectLevel.H, // ความละเอียดของ QR Code
-                margin: 4
+                correctLevel : QRCode.CorrectLevel.H
             });
-            
-            // Debug URL ใน Console
-            console.log("QR Data:", trackingUrl);
 
-            // ฟังก์ชันดาวน์โหลดรูปภาพ
-            // --- ฟังก์ชันดาวน์โหลดแบบมีกรอบขาว (ใหม่) ---
+            // 3. ฟังก์ชันดาวน์โหลด (ปรับปรุงใหม่)
             document.getElementById('downloadQrBtn').addEventListener('click', function() {
-                setTimeout(() => {
-                    // หา element ที่เก็บรูป QR Code (อาจเป็น img หรือ canvas)
-                    const qrElement = qrContainer.querySelector('img') || qrContainer.querySelector('canvas');
-                    
-                    if (qrElement) {
-                        // กำหนดขนาดกรอบและขนาดรูป
-                        const borderSize = 20; // ขนาดขอบขาว (พิกเซล)
-                        const qrSize = 250;    // ขนาด QR Code
-                        const finalSize = qrSize + (borderSize * 2); // ขนาดภาพสุดท้าย
+                // หา Canvas ที่ qrcode.js สร้างขึ้นมา
+                const qrCanvas = qrContainer.querySelector('canvas');
+                
+                if (qrCanvas) {
+                    const borderSize = 40; // ขนาดขอบขาว
+                    const finalSize = qrCanvas.width + (borderSize * 2);
 
-                        // สร้าง Canvas ใหม่ในหน่วยความจำ
-                        const canvas = document.createElement('canvas');
-                        canvas.width = finalSize;
-                        canvas.height = finalSize;
-                        const ctx = canvas.getContext('2d');
+                    // สร้าง Canvas สำหรับดาวน์โหลด
+                    const downloadCanvas = document.createElement('canvas');
+                    downloadCanvas.width = finalSize;
+                    downloadCanvas.height = finalSize;
+                    const ctx = downloadCanvas.getContext('2d');
 
-                        // เทสีขาวลงไปให้เต็มเป็นพื้นหลัง (ทำกรอบ)
-                        ctx.fillStyle = '#FFFFFF';
-                        ctx.fillRect(0, 0, finalSize, finalSize);
+                    // ระบายพื้นหลังสีขาว (สำคัญมาก)
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillRect(0, 0, finalSize, finalSize);
 
-                        // วาด QR Code ทับลงไปตรงกลาง
-                        // drawImage(source, x, y, width, height)
-                        ctx.drawImage(qrElement, borderSize, borderSize, qrSize, qrSize);
+                    // วาดรูป QR จาก Canvas ต้นฉบับลงไปตรงกลาง
+                    ctx.drawImage(qrCanvas, borderSize, borderSize);
 
-                        // บันทึกภาพจาก Canvas ใหม่
+                    // ดาวน์โหลด
+                    const link = document.createElement('a');
+                    link.href = downloadCanvas.toDataURL("image/png");
+                    link.download = `Repair_Status_${trackingId}.png`;
+                    link.click();
+                } else {
+                    // กรณีเครื่องช้าแล้ว Canvas ยังไม่มา ให้ลองดึงจากก img แทน
+                    const qrImg = qrContainer.querySelector('img');
+                    if (qrImg && qrImg.src) {
                         const link = document.createElement('a');
-                        link.href = canvas.toDataURL("image/png");
-                        link.download = `Repair_QR_Bordered_${trackingId}.png`;
-                        document.body.appendChild(link);
+                        link.href = qrImg.src;
+                        link.download = `Repair_Status_${trackingId}.png`;
                         link.click();
-                        document.body.removeChild(link);
-
                     } else {
-                        alert("กำลังสร้าง QR Code... กรุณาลองใหม่อีกครั้ง");
+                        alert("กรุณารอสักครู่ กำลังเตรียมรูปภาพ...");
                     }
-                }, 100);
+                }
             });
         }
     });
