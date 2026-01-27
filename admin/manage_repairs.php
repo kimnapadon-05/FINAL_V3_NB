@@ -140,7 +140,7 @@ $result = $conn->query($sql);
 </head>
 <body>
 
-    <?php include 'sidebar.php'; ?>
+        <?php include 'Sidebar.php'; ?>
 
     <div class="main-content">
         <div class="d-flex justify-content-between align-items-center mb-4">

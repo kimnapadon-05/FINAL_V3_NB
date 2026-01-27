@@ -102,7 +102,7 @@ if (!isset($_SESSION['admin_logged_in'])) {
 <body>
 
     <!-- Sidebar (Nav) -->
-    <?php include 'sidebar.php'; ?>
+        <?php include 'Sidebar.php'; ?>
 
     <div class="main-content">
         

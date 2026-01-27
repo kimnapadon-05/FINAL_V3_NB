@@ -208,7 +208,7 @@ $result_latest = $conn->query($sql_latest);
 <body>
 
     <!-- Sidebar -->
-    <?php include 'sidebar.php'; ?>
+    <?php include 'Sidebar.php'; ?>
 
     <!-- Main Content -->
     <main class="main-content">
