@@ -2,7 +2,7 @@
 session_start();
 // ตรวจสอบสิทธิ์การเข้าใช้งาน
 if (!isset($_SESSION['admin_logged_in'])) {
-    header("Location: index.php");
+    header("Location: index.php"); // ถ้าไม่มีสิทธิ์ ดีดกลับไปหน้า Login
     exit();
 }
 
