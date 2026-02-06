@@ -12,13 +12,15 @@ $current_page = basename($_SERVER['PHP_SELF']);
 <nav class="sidebar" id="mainSidebar">
     <div class="container ps-0">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <a class="navbar-brand mb-0" href="dashboard.php">
-                <img src="../logo/logo.png" alt="Logo" height="40" class="d-inline-block align-text-top">
-                <span>ระบบเเจ้งซ่อมอุปกรณ์ IT   </span>
-            </a>
-            <i class="bi bi-x-lg d-md-none text-muted" id="closeSidebarBtn" style="cursor: pointer;"></i>
-        </div>
+        <a class="navbar-brand mb-0" href="dashboard.php">
+            <img src="../logo/logo.png" alt="Logo" 
+             class="d-inline-block align-text-top"
+             style="height: 40px; width: 40px; object-fit: cover; border-radius: 50%; border: 2px solid #e2e8f0;">
+            <span>ระบบเเจ้งซ่อมอุปกรณ์ IT</span>
+        </a>
+        <i class="bi bi-x-lg d-md-none text-muted" id="closeSidebarBtn" style="cursor: pointer;"></i>
     </div>
+</div>
     
     <ul class="nav-menu">
         <li class="nav-item">
@@ -48,7 +50,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
     </ul>
 
     <div class="user-profile-card">
-        <div class="user-avatar">AD</div>
+        <img src="../logo/AD.png" alt="User Avatar" class="user-avatar">
         <div class="user-info">
             <h6>Admin User</h6>
             <span>ผู้ดูแลระบบ</span>
