@@ -1,0 +1,268 @@
+/* =========================================
+   Admin Dashboard CSS - สมบูรณ์แบบ Responsive 2025
+   ========================================= */
+
+:root {
+    --sidebar-width: 280px;
+    --primary: #4e54c8;              /* สีหลัก (ม่วงน้ำเงิน) */
+    --primary-dark: #3b3fa8;          /* สีเข้มขึ้นสำหรับ hover/active */
+    --primary-light: #6f75e6;         /* สีอ่อนสำหรับ gradient */
+    --bg: #f3f4f6;
+    --text: #334155;
+    --gray: #64748b;
+    --light: #f8fafc;
+    --danger: #ef4444;
+    --success: #10b981;
+    --warning: #f59e0b;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+    font-family: 'Kanit', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
+
+/* =========================================
+   Hamburger Button (ปุ่มเปิด Sidebar บนมือถือ)
+   ========================================= */
+.navbar-toggler {
+    display: none;
+    position: fixed;
+    top: 1rem;
+    right: 1rem;                    /* อยู่ขวามือ ไม่บังชื่อหัวข้อ/วันที่ */
+    z-index: 1100;
+    width: 50px;
+    height: 50px;
+    background: white;
+    border: 2px solid var(--primary);
+    color: var(--primary);
+    border-radius: 12px;
+    font-size: 1.6rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+
+.navbar-toggler:hover,
+.navbar-toggler:active {
+    background: var(--primary);
+    color: white;
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(78,84,200,0.3);
+}
+
+/* =========================================
+   Sidebar
+   ========================================= */
+.sidebar {
+    width: var(--sidebar-width);
+    background: white;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.05);
+    z-index: 1050;
+    transition: transform 0.4s ease;
+}
+
+.sidebar .navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+}
+
+.nav-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2rem 0;
+    flex-grow: 1;
+}
+
+.nav-item { margin-bottom: 0.5rem; }
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    color: var(--gray);
+    text-decoration: none;
+    border-radius: 12px;
+    transition: all 0.25s ease;
+    font-weight: 500;
+}
+
+.nav-link:hover {
+    background: var(--light);
+    color: var(--primary);
+    transform: translateX(6px);
+}
+
+.nav-link.active {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: white;
+    box-shadow: 0 4px 12px rgba(78,84,200,0.3);
+}
+
+.nav-link i { font-size: 1.3rem; }
+
+.user-profile-card {
+    background: var(--light);
+    padding: 12px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: auto;
+    border: 1px solid #e2e8f0;
+}
+
+.user-avatar {
+    width: 44px;
+    height: 44px;
+    background: #e0e7ff;
+    color: var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.logout-btn {
+    color: var(--danger);
+    font-size: 1.4rem;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.logout-btn:hover { color: #dc2626; }
+
+/* =========================================
+   Main Content
+   ========================================= */
+.main-content {
+    margin-left: var(--sidebar-width);
+    padding: 2rem;
+    min-height: 100vh;
+    box-sizing: border-box;
+    transition: margin-left 0.4s ease;
+}
+
+/* =========================================
+   Responsive (มือถือ + Tablet)
+   ========================================= */
+@media (max-width: 992px) {
+    .navbar-toggler { display: flex !important; }
+
+    .sidebar {
+        transform: translateX(-100%);
+        width: 85vw !important;
+        box-shadow: 10px 0 30px rgba(0,0,0,0.2);
+    }
+
+    .sidebar.show {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0 !important;
+        padding: 6rem 1rem 2rem 1rem !important;  /* padding-top เยอะเพื่อไม่บังวันที่/หัวข้อ */
+    }
+
+    body { overflow-x: hidden !important; }
+
+    /* ป้องกันการ์ดและตารางล้น */
+    .row, .container, .table-responsive {
+        overflow-x: hidden;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+@media (min-width: 993px) {
+    .navbar-toggler { display: none !important; }
+}
+
+/* =========================================
+   Components (การ์ดสถิติ + ตาราง)
+   ========================================= */
+.stat-card {
+    background: white;
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.1);
+}
+
+.stat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    margin-bottom: 1rem;
+}
+
+.stat-pending .stat-icon { background: #fffbeb; color: #d97706; }
+.stat-repairing .stat-icon { background: #eff6ff; color: #2563eb; }
+.stat-completed .stat-icon { background: #f0fdf4; color: #15803d; }
+
+.table-card {
+    background: white;
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+    overflow: hidden;
+}
+
+.table thead th {
+    background: var(--light);
+    font-weight: 600;
+    color: var(--gray);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    padding: 1rem;
+}
+
+.status-pill {
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: inline-block;
+    min-width: 100px;
+    text-align: center;
+}

@@ -13,121 +13,12 @@ require_once "../db_connect.php"; // ตรวจสอบ path ให้ถู�
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     
-    <style>
-        :root {
-            --sidebar-width: 280px;
-            --primary-color: #4e54c8;
-            --bg-color: #f3f4f6;
-            --text-color: #334155;
-            --accent-gold: #c5a47e; /* เพิ่มสีทองสำหรับ Theme */
-        }
-
-        body { 
-            font-family: 'Kanit', sans-serif; 
-            background-color: var(--bg-color); 
-            color: var(--text-color);
-            display: flex;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-    
-        /* === Main Content === */
-        .main-content {
-            flex: 1;
-            margin-left: var(--sidebar-width);
-            padding: 2rem;
-        }
-
-        /* Dashboard Cards */
-        .stat-card {
-            background: #ffffff;
-            border-radius: 20px;
-            padding: 1.5rem;
-            border: none;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-            transition: transform 0.3s;
-            height: 100%;
-            position: relative;
-            overflow: hidden;
-        }
-        .stat-card:hover { transform: translateY(-5px); }
-        
-        .stat-icon {
-            width: 50px; height: 50px;
-            border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-        .btn-print-selected {
-            background: #1e1e2d; color: #c5a47e;
-            border: none; padding: 10px 20px; border-radius: 50px;
-            font-weight: 500; 
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Easing function ให้นุ่มนวล */
-            position: relative; overflow: hidden;
-        }
-        
-        .btn-print-selected:hover {
-            background: #2b2b40; color: #fff; 
-            transform: translateY(-4px) scale(1.02); /* ลอยขึ้นและขยายนิดนึง */
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15); /* เงาฟุ้งขึ้น */
-        }
-        
-        .btn-print-selected:active {
-            transform: translateY(2px) scale(0.95); /* กดยุบลงไปเหมือนสปริง */
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        /* 2. ปุ่มเพิ่ม (Add New) */
-        .btn-add-new {
-            background: var(--primary-color); color: white; border: none;
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .btn-add-new:hover {
-            background: #4338ca; 
-            transform: translateY(-4px) rotate(2deg); /* หมุนนิดๆ ให้ดูขี้เล่น */
-            box-shadow: 0 8px 20px rgba(78, 84, 200, 0.3);
-        }
-        .btn-add-new:active {
-            transform: translateY(2px) scale(0.95);
-        }
-
-        /* 3. ปุ่มไอคอนเล็กๆ (View / Delete) */
-        .btn-icon { 
-            width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; 
-            border-radius: 8px; border: none; transition: all 0.2s ease;
-        }
-        
-        .btn-view { background: #eef2ff; color: #4338ca; }
-        .btn-view:hover { 
-            background: #4338ca; color: white; 
-            transform: scale(1.15) rotate(-10deg); /* ขยายและเอียงซ้าย */
-        }
-        .btn-view:active { transform: scale(0.9); }
-
-        .btn-del { background: #fef2f2; color: #ef4444; }
-        .btn-del:hover { 
-            background: #ef4444; color: white; 
-            transform: scale(1.15) rotate(10deg); /* ขยายและเอียงขวา */
-        }
-        .btn-del:active { transform: scale(0.9); }
-
-        .stat-pending .stat-icon { background: #fffbeb; color: #fff176; }
-        .stat-repairing .stat-icon { background: #eff6ff; color: #ff7043; }
-        .stat-completed .stat-icon { background: #f0fdf4; color: #8bc34a; }
-
-        /* Table Card */
-        .table-card {
-            background: #ffffff;
-            border-radius: 20px;
-            padding: 2rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
+    <button class="navbar-toggler" type="button">
+    <i class="bi bi-list"></i>
+        </button>
     <!-- Sidebar Section -->
     <?php include 'Sidebar.php'; ?>
 
@@ -154,8 +45,8 @@ require_once "../db_connect.php"; // ตรวจสอบ path ให้ถู�
                 </div>
             </div>
 
-            <div class="card-luxury">
-                <div class="table-responsive">
+            <div class="table-responsive">
+            <table class="table table-hover align-middle">
                     <table id="equipmentTable" class="table table-hover w-100">
                         <thead>
                             <tr>
@@ -302,6 +193,13 @@ require_once "../db_connect.php"; // ตรวจสอบ path ให้ถู�
             document.getElementById('modalImg').src = (imgPath) ? imgPath : 'https://placehold.co/400x300?text=No+Image';
             document.getElementById('modalQr').src = (qrPath) ? qrPath : 'https://placehold.co/150x150?text=No+QR';
             new bootstrap.Modal(document.getElementById('viewModal')).show();
+        }
+        const toggler = document.querySelector('.navbar-toggler');
+        const sidebar = document.querySelector('.sidebar');
+        if (toggler && sidebar) {
+            toggler.addEventListener('click', () => {
+                sidebar.classList.toggle('show');
+            });
         }
     </script>
 </body>

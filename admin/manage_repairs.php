@@ -119,30 +119,21 @@ $result = $conn->query($sql);
 <head>
     <meta charset="UTF-8">
     <title>Manage Repairs</title>
-    <!-- ... (CSS เดิมของคุณ) ... -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
     
-    <style>
-        body { font-family: 'Kanit', sans-serif; background-color: #f3f4f6; }
-        .main-content { margin-left: 280px; padding: 2rem; min-height: 100vh; }
-        @media (max-width: 992px) { .main-content { margin-left: 0; } }
-        .table-card { background: #ffffff; border-radius: 20px; padding: 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
-        .status-pill { padding: 6px 16px; border-radius: 50px; font-size: 0.85rem; font-weight: 500; display: inline-block; min-width: 100px; text-align: center; }
-        
-        .info-label { font-size: 0.85rem; color: #94a3b8; margin-bottom: 2px; }
-        .info-value { font-weight: 500; color: #334155; font-size: 0.95rem; }
-        .info-group { margin-bottom: 1rem; }
-        .section-header { font-size: 0.9rem; font-weight: 600; color: #4e54c8; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <button class="navbar-toggler" type="button">
+    <i class="bi bi-list"></i>
+    </button>
+    <!-- Sidebar (Nav) -->
+    <?php include 'sidebar.php'; ?>
 
-        <?php include 'Sidebar.php'; ?>
-
-    <div class="main-content">
+    <main class="main-content container-fluid px-3 px-md-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h2 class="fw-bold mb-1">จัดการรายการแจ้งซ่อม</h2>
@@ -153,8 +144,8 @@ $result = $conn->query($sql);
             </div>
         </div>
 
-        <div class="table-card">
-            <table id="manageTable" class="table table-hover align-middle w-100">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
                 <thead class="table-light">
                     <tr>
                         <th width="15%">รหัสงาน</th>
@@ -368,6 +359,13 @@ $result = $conn->query($sql);
                 new bootstrap.Modal(document.getElementById('repairModal')).show();
             });
         });
+        const toggler = document.querySelector('.navbar-toggler');
+        const sidebar = document.querySelector('.sidebar');
+        if (toggler && sidebar) {
+            toggler.addEventListener('click', () => {
+                sidebar.classList.toggle('show');
+            });
+        }
     </script>
 </body>
 </html>

@@ -15,14 +15,7 @@ $result = $conn->query($sql);
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
     
-    <style>
-        body { font-family: 'Prompt', sans-serif; background-color: #f4f7fe; padding: 20px; }
-        .card-custom { border: none; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); background: white; padding: 20px; }
-        .btn-luxury { background: #1e1e2d; color: #c5a47e; border: none; padding: 10px 20px; border-radius: 8px; transition: 0.3s; }
-        .btn-luxury:hover { background: #2b2b40; color: #fff; transform: translateY(-2px); }
-        .table thead th { background-color: #f8f9fa; border: none; color: #666; font-weight: 600; }
-        .form-check-input:checked { background-color: #c5a47e; border-color: #c5a47e; }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
