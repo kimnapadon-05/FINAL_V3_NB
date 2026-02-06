@@ -29,34 +29,28 @@ $result_latest = $conn->query($sql_latest);
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet" href="styles.css">
+    
+    <link rel="stylesheet" href="styles.css?v=2">
 </head>
 <body>
-    <button class="navbar-toggler" type="button">
-    <i class="bi bi-list"></i>
-    </button>
 
-    <!-- Sidebar -->
     <?php include 'Sidebar.php'; ?>
 
     <!-- Main Content -->
-    <main class="main-content container-fluid px-3 px-md-4">
+    <main class="main-content">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h2 class="fw-bold m-0">Dashboard</h2>
-                <p class="text-muted">ยินดีต้อนรับกลับ, มาดูภาพรวมงานซ่อมกันเถอะ</p>
+                <p class="text-muted">ภาพรวมของระบบแจ้งซ่อมอุปกรณ์ IT</p>
             </div>
-            <div class="d-flex align-items-center gap-3">
-                <div class="bg-white px-3 py-2 rounded-3 border shadow-sm text-muted small">
-                    <i class="bi bi-calendar-event me-2"></i> <?php echo date('d M Y'); ?>
-                </div>
+            <div class="bg-white px-3 py-2 rounded-3 border shadow-sm text-muted small text-nowrap">
+                <i class="bi bi-calendar-event me-2"></i> <?php echo date('d M Y'); ?>
             </div>
         </div>
 
@@ -86,8 +80,8 @@ $result_latest = $conn->query($sql_latest);
         </div>
 
         <!-- Latest Table -->
-        <div class="table-responsive">
-        <table class="table table-hover align-middle">
+        <div class="table-card">
+            <div class="d-flex justify-content-between align-items-center mb-4">
                 <h5 class="fw-bold m-0">รายการแจ้งซ่อมล่าสุด</h5>
                 <a href="manage_repairs.php" class="btn btn-sm btn-outline-primary rounded-pill px-3">ดูทั้งหมด</a>
             </div>
@@ -132,15 +126,5 @@ $result_latest = $conn->query($sql_latest);
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-    const toggler = document.querySelector('.navbar-toggler');
-    const sidebar = document.querySelector('.sidebar');
-    if (toggler && sidebar) {
-        toggler.addEventListener('click', () => {
-            sidebar.classList.toggle('show');
-        });
-    }
-    </script>
-    <div class="sidebar-overlay"></div>                     
 </body>
 </html>

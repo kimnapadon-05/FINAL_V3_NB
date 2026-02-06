@@ -1,74 +1,25 @@
-/* =========================================
-   Admin Dashboard CSS - สมบูรณ์แบบ Responsive 2025
-   ========================================= */
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
 
 :root {
     --sidebar-width: 280px;
-    --primary: #4e54c8;              /* สีหลัก (ม่วงน้ำเงิน) */
-    --primary-dark: #3b3fa8;          /* สีเข้มขึ้นสำหรับ hover/active */
-    --primary-light: #6f75e6;         /* สีอ่อนสำหรับ gradient */
-    --bg: #f3f4f6;
-    --text: #334155;
-    --gray: #64748b;
-    --light: #f8fafc;
-    --danger: #ef4444;
-    --success: #10b981;
-    --warning: #f59e0b;
+    --primary-color: #4e54c8;
+    --bg-color: #f3f4f6;
+    --text-color: #334155;
 }
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-html, body {
-    width: 100%;
+body { 
+    font-family: 'Kanit', sans-serif; 
+    background-color: var(--bg-color); 
+    color: var(--text-color);
+    display: flex;
     min-height: 100vh;
     overflow-x: hidden;
-    font-family: 'Kanit', sans-serif;
-    background: var(--bg);
-    color: var(--text);
 }
 
-/* =========================================
-   Hamburger Button (ปุ่มเปิด Sidebar บนมือถือ)
-   ========================================= */
-.navbar-toggler {
-    display: none;
-    position: fixed;
-    top: 1rem;
-    right: 1rem;                    /* อยู่ขวามือ ไม่บังชื่อหัวข้อ/วันที่ */
-    z-index: 1100;
-    width: 50px;
-    height: 50px;
-    background: white;
-    border: 2px solid var(--primary);
-    color: var(--primary);
-    border-radius: 12px;
-    font-size: 1.6rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-    cursor: pointer;
-    transition: all 0.25s ease;
-    align-items: center;
-    justify-content: center;
-    display: flex;
-}
-
-.navbar-toggler:hover,
-.navbar-toggler:active {
-    background: var(--primary);
-    color: white;
-    transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(78,84,200,0.3);
-}
-
-/* =========================================
-   Sidebar
-   ========================================= */
+/* === Sidebar Styles === */
 .sidebar {
     width: var(--sidebar-width);
-    background: white;
+    background: #ffffff;
     height: 100vh;
     position: fixed;
     top: 0;
@@ -76,26 +27,26 @@ html, body {
     display: flex;
     flex-direction: column;
     padding: 1.5rem;
-    box-shadow: 4px 0 24px rgba(0,0,0,0.05);
-    z-index: 1050;
-    transition: transform 0.4s ease;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.02);
+    z-index: 1000;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .sidebar .navbar-brand {
     display: flex;
     align-items: center;
     gap: 12px;
-    color: var(--primary);
-    text-decoration: none;
+    font-size: 1.1rem;
     font-weight: 700;
-    font-size: 1.2rem;
+    color: var(--primary-color);
+    text-decoration: none;
     margin-bottom: 2rem;
 }
 
 .nav-menu {
     list-style: none;
     padding: 0;
-    margin: 0 0 2rem 0;
+    margin: 0;
     flex-grow: 1;
 }
 
@@ -106,163 +57,214 @@ html, body {
     align-items: center;
     gap: 14px;
     padding: 12px 16px;
-    color: var(--gray);
+    color: #64748b;
     text-decoration: none;
     border-radius: 12px;
-    transition: all 0.25s ease;
+    transition: all 0.2s ease;
     font-weight: 500;
 }
 
 .nav-link:hover {
-    background: var(--light);
-    color: var(--primary);
-    transform: translateX(6px);
+    background-color: #f8fafc;
+    color: var(--primary-color);
+    transform: translateX(4px);
 }
 
 .nav-link.active {
-    background: linear-gradient(135deg, var(--primary), var(--primary-light));
-    color: white;
-    box-shadow: 0 4px 12px rgba(78,84,200,0.3);
+    background: linear-gradient(135deg, #4e54c8 0%, #8f94fb 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(78, 84, 200, 0.25);
 }
 
-.nav-link i { font-size: 1.3rem; }
+.nav-link i { font-size: 1.2rem; }
 
 .user-profile-card {
-    background: var(--light);
+    background: #f8fafc;
     padding: 12px;
     border-radius: 16px;
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-top: auto;
+    margin-top: auto; 
     border: 1px solid #e2e8f0;
 }
 
 .user-avatar {
-    width: 44px;
-    height: 44px;
+    width: 40px; height: 40px;
     background: #e0e7ff;
-    color: var(--primary);
+    color: var(--primary-color);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: bold;
-    font-size: 1.1rem;
+    font-weight: 600;
 }
+
+.user-info h6 { margin: 0; font-size: 0.9rem; font-weight: 600; color: #334155; }
+.user-info span { font-size: 0.75rem; color: #94a3b8; }
 
 .logout-btn {
-    color: var(--danger);
-    font-size: 1.4rem;
+    color: #ef4444;
+    background: none;
+    border: none;
+    margin-left: auto;
     cursor: pointer;
+    padding: 5px;
+    border-radius: 8px;
     transition: 0.2s;
+    font-size: 1.2rem;
 }
+.logout-btn:hover { background: #fee2e2; }
 
-.logout-btn:hover { color: #dc2626; }
-
-/* =========================================
-   Main Content
-   ========================================= */
+/* === Main Content Styles (PC) === */
 .main-content {
+    flex: 1;
     margin-left: var(--sidebar-width);
     padding: 2rem;
-    min-height: 100vh;
-    box-sizing: border-box;
-    transition: margin-left 0.4s ease;
+    transition: all 0.3s ease;
 }
 
-/* =========================================
-   Responsive (มือถือ + Tablet)
-   ========================================= */
-@media (max-width: 992px) {
-    .navbar-toggler { display: flex !important; }
-
-    .sidebar {
-        transform: translateX(-100%);
-        width: 85vw !important;
-        box-shadow: 10px 0 30px rgba(0,0,0,0.2);
-    }
-
-    .sidebar.show {
-        transform: translateX(0);
-    }
-
-    .main-content {
-        margin-left: 0 !important;
-        padding: 6rem 1rem 2rem 1rem !important;  /* padding-top เยอะเพื่อไม่บังวันที่/หัวข้อ */
-    }
-
-    body { overflow-x: hidden !important; }
-
-    /* ป้องกันการ์ดและตารางล้น */
-    .row, .container, .table-responsive {
-        overflow-x: hidden;
-    }
-
-    .table-responsive {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-}
-
-@media (min-width: 993px) {
-    .navbar-toggler { display: none !important; }
-}
-
-/* =========================================
-   Components (การ์ดสถิติ + ตาราง)
-   ========================================= */
 .stat-card {
-    background: white;
+    background: #ffffff;
     border-radius: 20px;
     padding: 1.5rem;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
-    transition: transform 0.3s ease;
+    border: none;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    transition: transform 0.3s;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
 }
-
-.stat-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 28px rgba(0,0,0,0.1);
-}
+.stat-card:hover { transform: translateY(-5px); }
 
 .stat-icon {
-    width: 56px;
-    height: 56px;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.6rem;
+    width: 50px; height: 50px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem;
     margin-bottom: 1rem;
 }
 
-.stat-pending .stat-icon { background: #fffbeb; color: #d97706; }
-.stat-repairing .stat-icon { background: #eff6ff; color: #2563eb; }
-.stat-completed .stat-icon { background: #f0fdf4; color: #15803d; }
+.stat-pending .stat-icon { background: #fffbeb; color: #fff176; }
+.stat-repairing .stat-icon { background: #eff6ff; color: #ff7043; }
+.stat-completed .stat-icon { background: #f0fdf4; color: #8bc34a; }
 
 .table-card {
-    background: white;
+    background: #ffffff;
     border-radius: 20px;
-    padding: 1.5rem;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
-    overflow: hidden;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
 }
 
-.table thead th {
-    background: var(--light);
-    font-weight: 600;
-    color: var(--gray);
-    text-transform: uppercase;
-    font-size: 0.8rem;
-    padding: 1rem;
+.table th, .table td {
+    white-space: nowrap;
+    vertical-align: middle;
 }
 
-.status-pill {
-    padding: 6px 16px;
-    border-radius: 999px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    display: inline-block;
-    min-width: 100px;
-    text-align: center;
+/* === Mobile Responsive === */
+.mobile-toggle-btn {
+    display: none;
+    position: fixed;
+    top: 15px; left: 15px;
+    z-index: 1001;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 8px 12px;
+    color: var(--primary-color);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    cursor: pointer;
 }
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    backdrop-filter: blur(2px);
+}
+
+/* --- ส่วน Mobile (สำคัญมาก ห้ามหาย!) --- */
+@media (max-width: 768px) {
+    .sidebar { transform: translateX(-100%); box-shadow: none; }
+    .sidebar.active { transform: translateX(0); box-shadow: 4px 0 24px rgba(0,0,0,0.1); }
+    .mobile-toggle-btn { display: block; }
+    .sidebar-overlay.active { display: block; }
+    
+    .main-content {
+        margin-left: 0 !important;
+        padding: 15px; /* ลดช่องว่างขอบจอ */
+        padding-top: 70px;
+        width: 100vw; /* บังคับกว้างเท่าหน้าจอ */
+        overflow-x: hidden; /* ห้ามหน้าจอขยายออกข้าง (สำคัญ!) */
+    }
+    
+    .stat-card { margin-bottom: 1rem; }
+    .table-card {
+        padding: 15px; /* ลด Padding ในกล่อง (เดิม 2rem ใหญ่ไป) */
+        overflow-x: hidden; /* ป้องกันกล่องขยายเกิน */
+    }
+    .table-card {
+        padding: 15px; /* ลด Padding ในกล่อง (เดิม 2rem ใหญ่ไป) */
+        overflow-x: hidden; /* ป้องกันกล่องขยายเกิน */
+    }
+    /* กำหนดความกว้างตารางให้พอดี ไม่บีบตัวหนังสือ */
+    .table { 
+        min-width: 800px; /* กำหนดความกว้างขั้นต่ำให้ตารางยาวๆ */
+        width: auto !important;
+    }
+    
+    /* เผื่อกรณี DataTables สร้าง Wrapper */
+    .dataTables_wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+}
+
+/* === Styles อื่นๆ === */
+.status-pill { padding: 6px 16px; border-radius: 50px; font-size: 0.85rem; font-weight: 500; display: inline-block; min-width: 100px; text-align: center; }
+.info-label { font-size: 0.85rem; color: #94a3b8; margin-bottom: 2px; }
+.info-value { font-weight: 500; color: #334155; font-size: 0.95rem; }
+.info-group { margin-bottom: 1rem; }
+.section-header { font-size: 0.9rem; font-weight: 600; color: #4e54c8; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+
+.form-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f1f5f9;
+    max-width: 900px;
+    margin: 0 auto;
+}
+.btn-luxury {
+    background-color: #2563eb !important; color: white !important;
+    border-radius: 12px; padding: 12px; font-weight: 500; border: none;
+    transition: all 0.3s; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+.btn-luxury:hover {
+    background-color: #1d4ed8 !important; transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+}
+
+.btn-print-selected {
+    background: #1e1e2d; color: #c5a47e;
+    border: none; padding: 10px 20px; border-radius: 50px;
+    font-weight: 500; transition: all 0.2s;
+}
+.btn-print-selected:hover {
+    background: #2b2b40; color: #fff; transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.btn-icon { 
+    width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; 
+    border-radius: 8px; border: none; transition: all 0.2s ease;
+}
+.btn-view { background: #eef2ff; color: #4338ca; }
+.btn-view:hover { background: #4338ca; color: white; transform: scale(1.1); }
+
+.btn-del { background: #fef2f2; color: #ef4444; }
+.btn-del:hover { background: #ef4444; color: white; transform: scale(1.1); }
+

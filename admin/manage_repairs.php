@@ -118,6 +118,7 @@ $result = $conn->query($sql);
 <html lang="th">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Repairs</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -125,27 +126,25 @@ $result = $conn->query($sql);
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
     
     <link rel="stylesheet" href="styles.css">
+    
 </head>
 <body>
-    <button class="navbar-toggler" type="button">
-    <i class="bi bi-list"></i>
-    </button>
-    <!-- Sidebar (Nav) -->
-    <?php include 'sidebar.php'; ?>
 
-    <main class="main-content container-fluid px-3 px-md-4">
+        <?php include 'Sidebar.php'; ?>
+
+    <div class="main-content">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h2 class="fw-bold mb-1">จัดการรายการแจ้งซ่อม</h2>
-                <p class="text-muted small">Manage Repair Requests</p>
+                <p class="text-muted small">รายการแจ้งซ่อมทั้งหมดในระบบ</p>
             </div>
-            <div class="bg-white px-3 py-2 rounded-3 border shadow-sm text-muted small">
+            <div class="bg-white px-3 py-2 rounded-3 border shadow-sm text-muted small text-nowrap">
                 <i class="bi bi-calendar-event me-2"></i> <?php echo date('d M Y'); ?>
             </div>
         </div>
 
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
+        <div class="table-card">
+            <table id="manageTable" class="table table-hover align-middle w-100">
                 <thead class="table-light">
                     <tr>
                         <th width="15%">รหัสงาน</th>
@@ -359,13 +358,6 @@ $result = $conn->query($sql);
                 new bootstrap.Modal(document.getElementById('repairModal')).show();
             });
         });
-        const toggler = document.querySelector('.navbar-toggler');
-        const sidebar = document.querySelector('.sidebar');
-        if (toggler && sidebar) {
-            toggler.addEventListener('click', () => {
-                sidebar.classList.toggle('show');
-            });
-        }
     </script>
 </body>
 </html>

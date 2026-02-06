@@ -12,13 +12,11 @@ require_once "../db_connect.php"; // ตรวจสอบ path ให้ถู�
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="styles.css">
+    
 </head>
 <body>
-    <button class="navbar-toggler" type="button">
-    <i class="bi bi-list"></i>
-        </button>
+
     <!-- Sidebar Section -->
     <?php include 'Sidebar.php'; ?>
 
@@ -38,15 +36,11 @@ require_once "../db_connect.php"; // ตรวจสอบ path ให้ถู�
                     <button type="submit" class="btn btn-print-selected shadow-sm">
                         <i class="bi bi-printer-fill me-2"></i> พิมพ์ที่เลือก
                     </button>
-                    <!-- ปุ่มเพิ่ม -->
-                    <!--a href="QR_code.php" class="btn btn-primary rounded-pill px-4 shadow-sm" style="background: var(--primary-color); border:none;">
-                        <i class="bi bi-plus-lg me-2"></i>เพิ่มอุปกรณ์
-                    </a-->
                 </div>
             </div>
 
-            <div class="table-responsive">
-            <table class="table table-hover align-middle">
+            <div class="card-luxury">
+                <div class="table-responsive">
                     <table id="equipmentTable" class="table table-hover w-100">
                         <thead>
                             <tr>
@@ -55,7 +49,7 @@ require_once "../db_connect.php"; // ตรวจสอบ path ให้ถู�
                                     <input class="form-check-input" type="checkbox" id="selectAll">
                                 </th>
                                 <th>รูปภาพ</th>
-                                <th>Asset ID</th>
+                                <th>เลขครุภัณฑ์</th>
                                 <th>ชื่ออุปกรณ์ / Model</th>
                                 <th>ประเภท</th>
                                 <th>Location</th>
@@ -121,7 +115,7 @@ require_once "../db_connect.php"; // ตรวจสอบ path ให้ถู�
                 </div>
             </div>
         
-        </form> <!-- จบ Form -->
+        </form> 
 
     </div>
 
@@ -193,13 +187,6 @@ require_once "../db_connect.php"; // ตรวจสอบ path ให้ถู�
             document.getElementById('modalImg').src = (imgPath) ? imgPath : 'https://placehold.co/400x300?text=No+Image';
             document.getElementById('modalQr').src = (qrPath) ? qrPath : 'https://placehold.co/150x150?text=No+QR';
             new bootstrap.Modal(document.getElementById('viewModal')).show();
-        }
-        const toggler = document.querySelector('.navbar-toggler');
-        const sidebar = document.querySelector('.sidebar');
-        if (toggler && sidebar) {
-            toggler.addEventListener('click', () => {
-                sidebar.classList.toggle('show');
-            });
         }
     </script>
 </body>

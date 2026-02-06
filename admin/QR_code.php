@@ -17,25 +17,23 @@ if (!isset($_SESSION['admin_logged_in'])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
+
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <button class="navbar-toggler" type="button">
-    <i class="bi bi-list"></i>
-    </button>
+
     <!-- Sidebar (Nav) -->
-    <?php include 'sidebar.php'; ?>
+        <?php include 'Sidebar.php'; ?>
 
     <div class="main-content">
         
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h2 class="fw-bold mb-1">สร้าง QR Code ครุภัณฑ์</h2>
-                <p class="text-muted small">ระบบสร้าง QR Code สำหรับติดอุปกรณ์เพื่อแจ้งซ่อม</p>
+                <p class="text-muted small">สำหรับติดอุปกรณ์เพื่อแจ้งซ่อม</p>
             </div>
             <div class="d-flex align-items-center gap-3">
-                <div class="bg-white px-3 py-2 rounded-3 border shadow-sm text-muted small">
+                <div class="bg-white px-3 py-2 rounded-3 border shadow-sm text-muted small text-nowrap">
                     <i class="bi bi-calendar-event me-2"></i> <?php echo date('d M Y'); ?>
                 </div>
             </div>
@@ -139,11 +137,4 @@ if (!isset($_SESSION['admin_logged_in'])) {
             });
         }
     });
-    const toggler = document.querySelector('.navbar-toggler');
-        const sidebar = document.querySelector('.sidebar');
-        if (toggler && sidebar) {
-            toggler.addEventListener('click', () => {
-                sidebar.classList.toggle('show');
-            });
-        }
 </script>
