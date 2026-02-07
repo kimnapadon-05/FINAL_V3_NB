@@ -7,9 +7,9 @@ include '../db_connect.php';
 
 // --- เรียกใช้ PHPMailer ---
 // ตรวจสอบ Path ให้ถูกต้อง (สมมติว่าคุณเก็บไว้ใน includes/PHPMailer/src/)
-require '../includes/PHPMailer/src/Exception.php';
-require '../includes/PHPMailer/src/PHPMailer.php';
-require '../includes/PHPMailer/src/SMTP.php';
+require __DIR__ . '/../includes/PHPMailer/src/Exception.php';
+require __DIR__ . '/../includes/PHPMailer/src/PHPMailer.php';
+require __DIR__ . '/../includes/PHPMailer/src/SMTP.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -23,10 +23,10 @@ function sendEmailNotification($to, $name, $tracking_id, $device) {
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com';  // ใช้ Gmail SMTP
         $mail->SMTPAuth   = true;
-        $mail->Username   = '67319090008@lbtech.ac.th'; // 📧 ใส่อีเมลของคุณ
-        $mail->Password   = 'tkjb xped lwop vuzi'; // 🔑 ใส่ App Password 16 หลัก
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // หรือ ENCRYPTION_SMTPS
-        $mail->Port       = 587; // หรือ 465
+        $mail->Username   = '67319090008@lbtech.ac.th'; // อีเมลผู้ส่ง
+        $mail->Password   = 'tkjb xped lwop vuzi'; // รหัสผ่านแอป (App Password) ของ Gmail
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // การเข้ารหัสแบบ TLS
+        $mail->Port       = 587; // TLS port
 
         // ตั้งค่าผู้รับ-ผู้ส่ง
         $mail->setFrom('67319090008@lbtech.ac.th', 'IT Service Support');
