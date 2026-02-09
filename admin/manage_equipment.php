@@ -1,4 +1,10 @@
 <?php
+session_start();
+// ตรวจสอบสิทธิ์การเข้าใช้งาน
+if (!isset($_SESSION['admin_logged_in'])) {
+    header("Location: index.php"); // ถ้าไม่มีสิทธิ์ ดีดกลับไปหน้า Login
+    exit();
+}
 require_once "../db_connect.php"; // ตรวจสอบ path ให้ถูกต้อง (../ หรือ ./)
 ?>
 
@@ -12,8 +18,119 @@ require_once "../db_connect.php"; // ตรวจสอบ path ให้ถู�
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
     
+    <style>
+        :root {
+            --sidebar-width: 280px;
+            --primary-color: #4e54c8;
+            --bg-color: #f3f4f6;
+            --text-color: #334155;
+            --accent-gold: #c5a47e; /* เพิ่มสีทองสำหรับ Theme */
+        }
+
+        body { 
+            font-family: 'Kanit', sans-serif; 
+            background-color: var(--bg-color); 
+            color: var(--text-color);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+    
+        /* === Main Content === */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+        }
+
+        /* Dashboard Cards */
+        .stat-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            transition: transform 0.3s;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card:hover { transform: translateY(-5px); }
+        
+        .stat-icon {
+            width: 50px; height: 50px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .btn-print-selected {
+            background: #1e1e2d; color: #c5a47e;
+            border: none; padding: 10px 20px; border-radius: 50px;
+            font-weight: 500; 
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Easing function ให้นุ่มนวล */
+            position: relative; overflow: hidden;
+        }
+        
+        .btn-print-selected:hover {
+            background: #2b2b40; color: #fff; 
+            transform: translateY(-4px) scale(1.02); /* ลอยขึ้นและขยายนิดนึง */
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15); /* เงาฟุ้งขึ้น */
+        }
+        
+        .btn-print-selected:active {
+            transform: translateY(2px) scale(0.95); /* กดยุบลงไปเหมือนสปริง */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* 2. ปุ่มเพิ่ม (Add New) */
+        .btn-add-new {
+            background: var(--primary-color); color: white; border: none;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .btn-add-new:hover {
+            background: #4338ca; 
+            transform: translateY(-4px) rotate(2deg); /* หมุนนิดๆ ให้ดูขี้เล่น */
+            box-shadow: 0 8px 20px rgba(78, 84, 200, 0.3);
+        }
+        .btn-add-new:active {
+            transform: translateY(2px) scale(0.95);
+        }
+
+        /* 3. ปุ่มไอคอนเล็กๆ (View / Delete) */
+        .btn-icon { 
+            width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; 
+            border-radius: 8px; border: none; transition: all 0.2s ease;
+        }
+        
+        .btn-view { background: #eef2ff; color: #4338ca; }
+        .btn-view:hover { 
+            background: #4338ca; color: white; 
+            transform: scale(1.15) rotate(-10deg); /* ขยายและเอียงซ้าย */
+        }
+        .btn-view:active { transform: scale(0.9); }
+
+        .btn-del { background: #fef2f2; color: #ef4444; }
+        .btn-del:hover { 
+            background: #ef4444; color: white; 
+            transform: scale(1.15) rotate(10deg); /* ขยายและเอียงขวา */
+        }
+        .btn-del:active { transform: scale(0.9); }
+
+        .stat-pending .stat-icon { background: #fffbeb; color: #fff176; }
+        .stat-repairing .stat-icon { background: #eff6ff; color: #ff7043; }
+        .stat-completed .stat-icon { background: #f0fdf4; color: #8bc34a; }
+
+        /* Table Card */
+        .table-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        }
+    </style>
 </head>
 <body>
 
@@ -36,6 +153,10 @@ require_once "../db_connect.php"; // ตรวจสอบ path ให้ถู�
                     <button type="submit" class="btn btn-print-selected shadow-sm">
                         <i class="bi bi-printer-fill me-2"></i> พิมพ์ที่เลือก
                     </button>
+                    <!-- ปุ่มเพิ่ม -->
+                    <!--a href="QR_code.php" class="btn btn-primary rounded-pill px-4 shadow-sm" style="background: var(--primary-color); border:none;">
+                        <i class="bi bi-plus-lg me-2"></i>เพิ่มอุปกรณ์
+                    </a-->
                 </div>
             </div>
 
@@ -49,7 +170,7 @@ require_once "../db_connect.php"; // ตรวจสอบ path ให้ถู�
                                     <input class="form-check-input" type="checkbox" id="selectAll">
                                 </th>
                                 <th>รูปภาพ</th>
-                                <th>เลขครุภัณฑ์</th>
+                                <th>Asset ID</th>
                                 <th>ชื่ออุปกรณ์ / Model</th>
                                 <th>ประเภท</th>
                                 <th>Location</th>
@@ -115,7 +236,7 @@ require_once "../db_connect.php"; // ตรวจสอบ path ให้ถู�
                 </div>
             </div>
         
-        </form> 
+        </form> <!-- จบ Form -->
 
     </div>
 

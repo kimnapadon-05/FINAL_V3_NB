@@ -1,5 +1,7 @@
 <?php include 'includes/header.php'; ?>
 <?php 
+// ตรวจสอบว่ามีการ redirect มาจากการ timeout ของ session
+$show_timeout = isset($_GET['timeout']) && $_GET['timeout'] == 1;
 // ส่วนรองรับการสแกนผ่าน URL
 $url_asset_id = isset($_GET['asset_id']) ? htmlspecialchars($_GET['asset_id']) : '';
 ?>
@@ -110,6 +112,14 @@ $url_asset_id = isset($_GET['asset_id']) ? htmlspecialchars($_GET['asset_id']) :
     }
     .close-modal-btn:hover { background: rgba(0,0,0,0.1); }
 </style>
+
+<?php if ($show_timeout): ?>
+<div class="container mt-3">
+    <div class="alert alert-warning text-center mb-0">
+        เซสชันของคุณหมดอายุแล้ว กรุณาเข้าสู่ระบบใหม่
+    </div>
+</div>
+<?php endif; ?>
 
 <div class="luxury-content-wrapper py-4">
     <div class="row justify-content-center">

@@ -1,21 +1,27 @@
 <?php
 session_start();
 // ตรวจสอบสิทธิ์
-if (!isset($_SESSION['admin_logged_in'])) { header("Location: index.php"); exit(); }
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+if (!isset($_SESSION['admin_logged_in'])) {
+    header("Location: index.php");
+    exit();
+}
 
 include '../db_connect.php';
 
 // --- เรียกใช้ PHPMailer ---
 // ตรวจสอบ Path ให้ถูกต้อง (สมมติว่าคุณเก็บไว้ใน includes/PHPMailer/src/)
-require __DIR__ . '/../includes/PHPMailer/src/Exception.php';
-require __DIR__ . '/../includes/PHPMailer/src/PHPMailer.php';
-require __DIR__ . '/../includes/PHPMailer/src/SMTP.php';
+require_once __DIR__ . '/../includes/PHPMailer/src/Exception.php';
+require_once __DIR__ . '/../includes/PHPMailer/src/PHPMailer.php';
+require_once __DIR__ . '/../includes/PHPMailer/src/SMTP.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 // --- ฟังก์ชันส่งอีเมลด้วย PHPMailer ---
-function sendEmailNotification($to, $name, $tracking_id, $device, $img = '') {
+function sendEmailNotification($to, $name, $tracking_id, $device) {
     $mail = new PHPMailer(true);
 
     try {
@@ -23,10 +29,10 @@ function sendEmailNotification($to, $name, $tracking_id, $device, $img = '') {
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com';  // ใช้ Gmail SMTP
         $mail->SMTPAuth   = true;
-        $mail->Username   = '67319090008@lbtech.ac.th'; // อีเมลผู้ส่ง
-        $mail->Password   = 'tkjb xped lwop vuzi'; // รหัสผ่านแอป (App Password) ของ Gmail
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // การเข้ารหัสแบบ TLS
-        $mail->Port       = 587; // TLS port
+        $mail->Username   = '67319090008@lbtech.ac.th'; // 📧 ใส่อีเมลของคุณ
+        $mail->Password   = 'tkjb xped lwop vuzi'; // 🔑 ใส่ App Password 16 หลัก
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // หรือ ENCRYPTION_SMTPS
+        $mail->Port       = 587; // หรือ 465
 
         // ตั้งค่าผู้รับ-ผู้ส่ง
         $mail->setFrom('67319090008@lbtech.ac.th', 'IT Service Support');
@@ -42,46 +48,29 @@ function sendEmailNotification($to, $name, $tracking_id, $device, $img = '') {
             <h2 style='color: #28a745;'>งานซ่อมเสร็จสิ้นแล้ว ✅</h2>
             <p>เรียนคุณ <strong>$name</strong>,</p>
             <p>งานแจ้งซ่อมของคุณ รหัส: <strong>$tracking_id</strong></p>
-            <p>อุปกรณ์: <strong>$device</strong></p>";
-
-        // เพิ่มส่วนรูป ถ้ามี img_path
-        $cid = 'repair_image';  // ชื่อ CID ต้อง unique ในอีเมลนี้
-        if (!empty($img_path) && file_exists($img_path)) {
-            $bodyContent .= "
-            <p>รูปอุปกรณ์/ปัญหา:</p>
-            <p><img src='cid:$cid' alt='รูปอุปกรณ์' style='max-width:100%; height:auto; border-radius:8px;'></p>";
-        }
-
-        $bodyContent .= "
+            <p>อุปกรณ์: <strong>$device</strong></p>
             <hr>
-            <p>เจ้าหน้าที่ทำการซ่อมแก้ไขเรียบร้อยแล้วครับ สถานะปัจจุบันคือ <strong style='color:green'>เสร็จสิ้น</strong></p>
-            <p>คุณสามารถติดต่อรับอุปกรณ์คืนได้ที่แผนกเทคโนโลยีคอมพิวเตอร์ครับ</p>
+            <p>เจ้าหน้าที่ได้ดำเนินการตรวจสอบและแก้ไขเรียบร้อยแล้ว สถานะปัจจุบันคือ <strong style='color:green'>เสร็จสิ้น</strong></p>
+            <p>คุณสามารถติดต่อรับอุปกรณ์คืนได้ที่แผนก IT ครับ</p>
             <br>
             <small style='color: #999;'>อีเมลนี้เป็นการแจ้งเตือนอัตโนมัติ กรุณาอย่าตอบกลับ</small>
-        </div>"
-        ;
-        $mail->CharSet = 'UTF-8';
-        $mail->isHTML(true);
-            $mail->Body = $bodyContent;
-
-            // Embed รูป ถ้ามี
-            if (!empty($img_path) && file_exists($img_path)) {
-                $mail->addEmbeddedImage($img_path, $cid, basename($img_path));  // basename เพื่อชื่อไฟล์สวย ๆ
-            }
+        </div>
+        ";
+        $mail->Body = $bodyContent;
 
         $mail->send();
         return true;
     } catch (Exception $e) {
-        error_log("ส่งเมลไม่ได้: " . $mail->ErrorInfo);
+        // บันทึก Error ไว้ดู (ไม่แสดงหน้าเว็บเพื่อความสวยงาม)
+        error_log("Message could not be sent. Mailer Error: {$mail->ErrorInfo}");
         return false;
     }
 }
 
 // --- Logic Update Status ---
-// --- Logic Update Status ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
     $new_status = $_POST['update_status'];
-    $req_id     = $_POST['request_id'];
+    $req_id = $_POST['request_id'];
     
     $sql = "UPDATE requests SET status = ?, updated_at = NOW()";
     
@@ -98,10 +87,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
     
     if ($stmt->execute()) {
         
-        // ถ้าสถานะเป็น "เสร็จสิ้น" -> ส่งอีเมล
+        // ถ้าสถานะเป็น "เสร็จสิ้น" -> เรียกฟังก์ชันส่งอีเมล
         if ($new_status == 'เสร็จสิ้น') {
-            $sql_user = "SELECT reporter_email, reported_by, tracking_id, device_type, img_path 
-                         FROM requests WHERE id = ?";
+            $sql_user = "SELECT reporter_email, reported_by, tracking_id, device_type FROM requests WHERE id = ?";
             $stmt_user = $conn->prepare($sql_user);
             $stmt_user->bind_param("i", $req_id);
             $stmt_user->execute();
@@ -109,40 +97,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
             $user_data = $result_user->fetch_assoc();
             
             if ($user_data && !empty($user_data['reporter_email'])) {
-                
-                // คำนวณ full path ของรูปที่นี่ (หลังจากได้ $user_data แล้ว)
-                $img_path_db = trim($user_data['img_path'] ?? '');  // ลบช่องว่าง/slash เกิน
-                
-                $full_img_path = '';
-                if (!empty($img_path_db)) {
-                    // ใช้ $_SERVER['DOCUMENT_ROOT'] สำหรับ Plesk (แนะนำที่สุด)
-                    $full_img_path = $_SERVER['DOCUMENT_ROOT'] . '/uploads' . ltrim($img_path_db, '/');
-                    
-                    // หรือถ้า DOCUMENT_ROOT ไม่เวิร์ค ลองใช้ __DIR__ แบบนี้แทน (ขึ้น 2 ชั้นจาก admin/)
-                    // $full_img_path = __DIR__ . '/../../' . ltrim($img_path_db, '/');
-                    
-                    // Debug ชั่วคราว (เปิดดูใน error log)
-                    error_log("[DEBUG] Full image path: " . $full_img_path);
-                    error_log("[DEBUG] File exists? " . (file_exists($full_img_path) ? 'Yes' : 'No'));
-                }
-                
-                // เรียกฟังก์ชันโดยส่ง full path
+                // เรียกใช้ฟังก์ชัน PHPMailer ด้านบน
                 sendEmailNotification(
                     $user_data['reporter_email'],
                     $user_data['reported_by'],
                     $user_data['tracking_id'],
-                    $user_data['device_type'],
-                    $full_img_path   // ← ส่งอันนี้ ไม่ใช่ $user_data['img_path']
+                    $user_data['device_type']
                 );
             }
             $stmt_user->close();
         }
 
-        header("Location: manage_repairs.php?success=1");  // เพิ่ม parameter เพื่อแจ้งว่าสำเร็จ (optional)
+        header("Location: manage_repairs.php");
         exit();
     } else {
-        error_log("Update status error: " . $conn->error);  // เก็บ log ดีกว่า alert
-        echo "<script>alert('เกิดข้อผิดพลาดในการอัปเดต: " . addslashes($conn->error) . "');</script>";
+        echo "<script>alert('Error: " . $conn->error . "');</script>";
     }
     $stmt->close();
 }
@@ -155,15 +124,25 @@ $result = $conn->query($sql);
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Repairs</title>
+    <!-- ... (CSS เดิมของคุณ) ... -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
     
-    <link rel="stylesheet" href="styles.css">
-    
+    <style>
+        body { font-family: 'Kanit', sans-serif; background-color: #f3f4f6; }
+        .main-content { margin-left: 280px; padding: 2rem; min-height: 100vh; }
+        @media (max-width: 992px) { .main-content { margin-left: 0; } }
+        .table-card { background: #ffffff; border-radius: 20px; padding: 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
+        .status-pill { padding: 6px 16px; border-radius: 50px; font-size: 0.85rem; font-weight: 500; display: inline-block; min-width: 100px; text-align: center; }
+        
+        .info-label { font-size: 0.85rem; color: #94a3b8; margin-bottom: 2px; }
+        .info-value { font-weight: 500; color: #334155; font-size: 0.95rem; }
+        .info-group { margin-bottom: 1rem; }
+        .section-header { font-size: 0.9rem; font-weight: 600; color: #4e54c8; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+    </style>
 </head>
 <body>
 
@@ -173,9 +152,9 @@ $result = $conn->query($sql);
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h2 class="fw-bold mb-1">จัดการรายการแจ้งซ่อม</h2>
-                <p class="text-muted small">รายการแจ้งซ่อมทั้งหมดในระบบ</p>
+                <p class="text-muted small">Manage Repair Requests</p>
             </div>
-            <div class="bg-white px-3 py-2 rounded-3 border shadow-sm text-muted small text-nowrap">
+            <div class="bg-white px-3 py-2 rounded-3 border shadow-sm text-muted small">
                 <i class="bi bi-calendar-event me-2"></i> <?php echo date('d M Y'); ?>
             </div>
         </div>
